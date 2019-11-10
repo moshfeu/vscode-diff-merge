@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cat Coding</title>
+
+
+    <!-- optionally include CSS, or use your own -->
+    <link href="https://unpkg.com/ace-diff@^2.0.0/dist/ace-diff.min.css" rel="stylesheet">
+</head>
+<body>
+  <div class="acediff"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.3.3/ace.js"></script>
+  <script src="https://unpkg.com/ace-diff@^2.0.0"></script>
+  <script>
+    var differ = new AceDiff({
+      element: '.acediff',
+      left: {
+        content: '${leftContent}' || 'your first file content here',
+      },
+      right: {
+        content: '${rightContent}' || 'your second file content here',
+      },
+    });
+  </script>
+</body>
+</html>

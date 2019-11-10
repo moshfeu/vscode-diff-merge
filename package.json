@@ -1,0 +1,59 @@
+{
+  "name": "diff-merge",
+  "displayName": "Diff Merge",
+  "description": "Show diffs and merge",
+  "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/moshfeu/vscode-diff-merge"
+  },
+  "keywords": [
+    "compare",
+    "diff",
+    "diff-merge"
+  ],
+  "icon": "resources/icon.png",
+  "galleryBanner": {
+    "color": "#f5f5f5",
+    "theme": "light"
+  },
+  "publisher": "moshfeu",
+  "author": {
+    "name": "Mosh Feuchtwanger",
+    "email": "moshfeu.dev@gmail.com",
+    "url": "https://twitter.com/moshfeu"
+  },
+  "engines": {
+    "vscode": "^1.38.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "*"
+  ],
+  "main": "./out/extension.js",
+  "scripts": {
+    "vscode:prepublish": "yarn run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "yarn run compile",
+    "test": "node ./out/test/runTest.js",
+    "deploy": "vsce publish -p"
+  },
+  "devDependencies": {
+    "@types/glob": "^7.1.1",
+    "@types/lodash": "^4.14.140",
+    "@types/mocha": "^5.2.6",
+    "@types/node": "^10.12.21",
+    "@types/vscode": "^1.38.0",
+    "glob": "^7.1.4",
+    "mocha": "^6.1.4",
+    "tslint": "^5.12.1",
+    "typescript": "^3.3.1",
+    "vsce": "^1.67.1",
+    "vscode-test": "^1.0.2"
+  },
+  "dependencies": {
+  }
+}
