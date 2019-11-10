@@ -1,34 +1,63 @@
 import * as vscode from 'vscode';
 import {join} from 'path';
-import {readFileSync} from 'fs';
+import {readFileSync, writeFileSync} from 'fs';
+
+const readOptions = {
+  encoding: 'utf8'
+};
 
 export function activate(context: vscode.ExtensionContext) {
+  vscode.commands.registerCommand('diffMerge.chooseFile', async (e: vscode.Uri) => {
+    const file = await vscode.window.showOpenDialog({});
+    if (file) {
+      showDiff(file[0], e, context);
+    }
+  });
+}
+
+function showDiff(leftUri: vscode.Uri, rightUri: vscode.Uri, context: vscode.ExtensionContext) {
   const panel = vscode.window.createWebviewPanel(
-    'catCoding',
-    'Cat Coding',
+    'mergeDiff.file',
+    'Diff & merge',
     vscode.ViewColumn.One,
     {
-      enableScripts: true
+      enableScripts: true,
+      retainContextWhenHidden: true,
     }
   );
 
   // And set its HTML content
-  panel.webview.html = getWebviewContent(context);
+  panel.webview.html = getWebviewContent(leftUri, rightUri, context);
+  panel.webview.onDidReceiveMessage(e => {
+    switch (e.command) {
+      case 'save':
+        const {left: leftContent, right: rightContent} = e.contents;
+        writeFileSync(rightUri.fsPath, rightContent, readOptions);
+        break;
+      default:
+        break;
+    }
+  });
 }
 
-function getWebviewContent(context: vscode.ExtensionContext) {
-  const interpolate = function(str: string, params: object) {
-    const names = Object.keys(params);
-    const vals = Object.values(params);
-    return new Function(...names, `return \`${str}\`;`)(...vals);
+function getWebviewContent(left: vscode.Uri, right: vscode.Uri, context: vscode.ExtensionContext) {
+  const interpolate = function(str: string, params: {[key: string]: string}) {
+    const output = str.replace(/###(.*)###/g, (_, exact) => {
+      return params[exact];
+    });
+    return output;
   };
 
-  const template = readFileSync(join(context.extensionPath, 'src', 'diff', 'index.html'), {
-    encoding: 'utf8'
+  const template = readFileSync(join(context.extensionPath, 'src', 'diff', 'index.html'), readOptions);
+
+  const leftContent = readFileSync(left.fsPath, readOptions);
+  const rightContent = readFileSync(right.fsPath, readOptions);
+
+  const result = interpolate(template, {
+    path: left.fsPath,
+    leftContent,
+    rightContent,
   });
 
-  return interpolate(template, {
-    leftContent: 'left from extension!!',
-    rightContent: 'right from extension!!',
-  });
+  return result;
 }

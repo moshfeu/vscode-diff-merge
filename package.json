@@ -55,5 +55,20 @@
     "vscode-test": "^1.0.2"
   },
   "dependencies": {
+  },
+  "contributes": {
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "diffMerge.chooseFile"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "title": "Choose File to merge",
+        "command": "diffMerge.chooseFile"
+      }
+    ]
   }
 }
