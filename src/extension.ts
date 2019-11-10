@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import {join} from 'path';
+import {join, relative} from 'path';
 import {readFileSync, writeFileSync} from 'fs';
 
 const readOptions = {
@@ -15,10 +15,17 @@ export function activate(context: vscode.ExtensionContext) {
   });
 }
 
+function getFilePath(path: string): string {
+  if (vscode.workspace.workspaceFolders && path.includes(vscode.workspace.workspaceFolders[0].uri.fsPath)) {
+    return relative(vscode.workspace.workspaceFolders[0].uri.fsPath, path);
+  }
+  return path;
+}
+
 function showDiff(leftUri: vscode.Uri, rightUri: vscode.Uri, context: vscode.ExtensionContext) {
   const panel = vscode.window.createWebviewPanel(
     'mergeDiff.file',
-    'Diff & merge',
+    `${getFilePath(leftUri.fsPath)}↔${getFilePath(rightUri.fsPath)}`,
     vscode.ViewColumn.One,
     {
       enableScripts: true,
