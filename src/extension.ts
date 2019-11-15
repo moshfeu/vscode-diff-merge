@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import {join, relative} from 'path';
 import {readFileSync, writeFileSync} from 'fs';
 
-const readOptions = {
+const utf8Stream = {
   encoding: 'utf8'
 };
 
@@ -33,13 +33,19 @@ function showDiff(leftUri: vscode.Uri, rightUri: vscode.Uri, context: vscode.Ext
     }
   );
 
-  // And set its HTML content
+  const UNSAVED_SYMBOL = ' •';
   panel.webview.html = getWebviewContent(leftUri, rightUri, context);
   panel.webview.onDidReceiveMessage(e => {
     switch (e.command) {
+      case 'change':
+        if (!panel.title.includes(UNSAVED_SYMBOL)) {
+          panel.title += UNSAVED_SYMBOL;
+        }
+        break;
       case 'save':
-        const {left: leftContent, right: rightContent} = e.contents;
-        writeFileSync(rightUri.fsPath, rightContent, readOptions);
+        panel.title = panel.title.replace(UNSAVED_SYMBOL, '');
+        const {right: rightContent} = e.contents;
+        writeFileSync(rightUri.fsPath, rightContent, utf8Stream);
         break;
       default:
         break;
@@ -55,10 +61,10 @@ function getWebviewContent(left: vscode.Uri, right: vscode.Uri, context: vscode.
     return output;
   };
 
-  const template = readFileSync(join(context.extensionPath, 'src', 'diff', 'index.html'), readOptions);
+  const template = readFileSync(join(context.extensionPath, 'src', 'diff', 'index.html'), utf8Stream);
 
-  const leftContent = readFileSync(left.fsPath, readOptions);
-  const rightContent = readFileSync(right.fsPath, readOptions);
+  const leftContent = readFileSync(left.fsPath, utf8Stream);
+  const rightContent = readFileSync(right.fsPath, utf8Stream);
 
   const result = interpolate(template, {
     path: left.fsPath,

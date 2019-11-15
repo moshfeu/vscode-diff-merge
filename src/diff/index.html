@@ -16,7 +16,7 @@
     const modelist = ace.require("ace/ext/modelist");
     const {mode} = modelist.getModeForPath('###path###');
 
-    const vscode = acquireVsCodeApi();
+    const vscode = typeof acquireVsCodeApi !== 'undefined' ? acquireVsCodeApi() : window;
     const differ = new AceDiff({
       element: '.acediff',
       mode,
@@ -30,10 +30,17 @@
       },
     });
 
-    document.addEventListener("keydown", function(e) {
-      if ((window.navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)  && e.keyCode == 83) {
+    const {left, right} = differ.getEditors();
+
+    right.on('change', () => {
+      vscode.postMessage({
+        command: 'change',
+      });
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if ((window.navigator.platform.match('Mac') ? e.metaKey : e.ctrlKey)  && e.keyCode == 83) {
         e.preventDefault();
-        const {left, right} = differ.getEditors();
         vscode.postMessage({
           command: 'save',
           contents: {
