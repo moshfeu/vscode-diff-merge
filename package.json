@@ -54,13 +54,17 @@
     "vsce": "^1.67.1",
     "vscode-test": "^1.0.2"
   },
-  "dependencies": {
-  },
+  "dependencies": {},
   "contributes": {
     "menus": {
       "explorer/context": [
         {
           "command": "diffMerge.chooseFile"
+        }
+      ],
+      "scm/resourceState/context": [
+        {
+          "command": "diffMerge.scm.file"
         }
       ]
     },
@@ -68,6 +72,10 @@
       {
         "title": "Choose File to merge",
         "command": "diffMerge.chooseFile"
+      },
+      {
+        "title": "Diff & Merge",
+        "command": "diffMerge.scm.file"
       }
     ]
   }

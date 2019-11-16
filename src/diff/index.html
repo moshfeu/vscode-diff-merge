@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cat Coding</title>
     <link href="https://unpkg.com/ace-diff@^2.0.0/dist/ace-diff.min.css" rel="stylesheet">
 </head>
 <body>
@@ -21,11 +20,11 @@
       element: '.acediff',
       mode,
       left: {
-        content: `###leftContent###` || 'your first file content here',
+        content: `###leftContent###`,
         editable: false,
       },
       right: {
-        content: `###rightContent###` || 'your second file content here',
+        content: `###rightContent###`,
         copyLinkEnabled: false,
       },
     });
