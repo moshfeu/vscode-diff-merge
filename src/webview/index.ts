@@ -20,7 +20,7 @@ export function showDiff({ leftContent, rightContent, leftPath, rightPath, conte
 
     const template = getTemplate('diff', context);
     panel.webview.html = render(template, {
-      rightPath,
+      path: rightPath,
       leftContent,
       rightContent,
       fileNotSupported
