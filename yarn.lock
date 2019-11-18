@@ -32,6 +32,13 @@
     "@types/minimatch" "*"
     "@types/node" "*"
 
+"@types/istextorbinary@^2.3.0":
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/@types/istextorbinary/-/istextorbinary-2.3.0.tgz#1e58f580fc74f0a7f875d171ee4324e3349bfbb4"
+  integrity sha512-8Xl9onTFM8VO6cgu6aYt5o45m9mh4xbhfjLtv9A13F64R5/wCwl2Xdrt6I+M6+8j/4ndkvxdBNPbLTFdYhn+iA==
+  dependencies:
+    "@types/node" "*"
+
 "@types/lodash@^4.14.140":
   version "4.14.146"
   resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.146.tgz#de0d2c8610012f12a6a796455054cbc654f8fecf"
@@ -112,6 +119,11 @@ balanced-match@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/balanced-match/-/balanced-match-1.0.0.tgz#89b4d199ab2bee49de164ea02b89ce462d71b767"
   integrity sha1-ibTRmasr7kneFk6gK4nORi1xt2c=
+
+binaryextensions@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/binaryextensions/-/binaryextensions-2.2.0.tgz#e7c6ba82d4f5f5758c26078fe8eea28881233311"
+  integrity sha512-bHhs98rj/7i/RZpCSJ3uk55pLXOItjIrh2sRQZSM6OoktScX+LxJzvlU+FELp9j3TdcddTmmYArLSGptCTwjuw==
 
 boolbase@~1.0.0:
   version "1.0.0"
@@ -542,6 +554,14 @@ isexe@^2.0.0:
   resolved "https://registry.yarnpkg.com/isexe/-/isexe-2.0.0.tgz#e8fbf374dc556ff8947a10dcb0572d633f2cfa10"
   integrity sha1-6PvzdNxVb/iUehDcsFctYz8s+hA=
 
+istextorbinary@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/istextorbinary/-/istextorbinary-3.0.0.tgz#edf7361fd904cd7617011eb4203118c25590c524"
+  integrity sha512-L/YkjYX1uYOS59cc61SlfDXKoWY3OS67bw4tu5e6XyP86nw4RZm8J7BfkLiOmty3DSAE4q9R7xC79XJHfiZh4A==
+  dependencies:
+    binaryextensions "^2.2.0"
+    textextensions "^2.6.0"
+
 js-tokens@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/js-tokens/-/js-tokens-4.0.0.tgz#19203fb59991df98e3a287050d4647cdeaf32499"
@@ -929,6 +949,11 @@ supports-color@^5.3.0:
   integrity sha512-QjVjwdXIt408MIiAqCX4oUKsgU2EqAGzs2Ppkm4aQYbjm+ZEWEcW4SfFNTr4uMNZma0ey4f5lgLrkB0aX0QMow==
   dependencies:
     has-flag "^3.0.0"
+
+textextensions@^2.6.0:
+  version "2.6.0"
+  resolved "https://registry.yarnpkg.com/textextensions/-/textextensions-2.6.0.tgz#d7e4ab13fe54e32e08873be40d51b74229b00fc4"
+  integrity sha512-49WtAWS+tcsy93dRt6P0P3AMD2m5PvXRhuEA0kaXos5ZLlujtYmpmFsB+QvWUSxE1ZsstmYXfQ7L40+EcQgpAQ==
 
 tmp@0.0.29:
   version "0.0.29"

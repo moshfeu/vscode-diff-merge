@@ -43,6 +43,7 @@
   },
   "devDependencies": {
     "@types/glob": "^7.1.1",
+    "@types/istextorbinary": "^2.3.0",
     "@types/lodash": "^4.14.140",
     "@types/mocha": "^5.2.6",
     "@types/node": "^10.12.21",
@@ -54,7 +55,9 @@
     "vsce": "^1.67.1",
     "vscode-test": "^1.0.2"
   },
-  "dependencies": {},
+  "dependencies": {
+    "istextorbinary": "^3.0.0"
+  },
   "contributes": {
     "menus": {
       "explorer/context": [

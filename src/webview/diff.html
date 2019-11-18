@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     .lds-ellipsis {
       display: inline-block;
@@ -75,17 +74,23 @@
   <script>
     const modelist = ace.require("ace/ext/modelist");
     const {mode} = modelist.getModeForPath('###path###');
+    const notSupportedFile = '###fileNotSupported###';
+    const leftContent = `###leftContent###`;
+    const rightContent = `###rightContent###`;
 
     const vscode = typeof acquireVsCodeApi !== 'undefined' ? acquireVsCodeApi() : window;
     const differ = new AceDiff({
       element: '.acediff',
       mode,
+      showDiffs: leftContent !== notSupportedFile && rightContent !== notSupportedFile,
       left: {
-        content: `###leftContent###`,
+        content: leftContent,
         editable: false,
+        copyLinkEnabled: leftContent !== notSupportedFile,
       },
       right: {
-        content: `###rightContent###`,
+        content: rightContent,
+        editable: rightContent !== notSupportedFile,
         copyLinkEnabled: false,
       },
     });
