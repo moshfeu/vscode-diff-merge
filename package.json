@@ -12,7 +12,7 @@
     "diff",
     "diff-merge"
   ],
-  "icon": "resources/icon.png",
+  "icon": "",
   "galleryBanner": {
     "color": "#f5f5f5",
     "theme": "light"
@@ -39,6 +39,7 @@
     "watch": "tsc -watch -p ./",
     "pretest": "yarn run compile",
     "test": "node ./out/test/runTest.js",
+    "package": "vsce package",
     "deploy": "vsce publish -p"
   },
   "devDependencies": {
@@ -52,7 +53,7 @@
     "mocha": "^6.1.4",
     "tslint": "^5.12.1",
     "typescript": "^3.3.1",
-    "vsce": "^1.67.1",
+    "vsce": "^1.69.0",
     "vscode-test": "^1.0.2"
   },
   "dependencies": {
