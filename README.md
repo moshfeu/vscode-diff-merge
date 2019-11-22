@@ -29,3 +29,4 @@ Show diffs and merge from left side to right side.
 - Scroll locking (while scrolling, scroll the other editor)
 - Diff editors theme has different look & feel than vscode
 - Focus the tab when comparing the same file
+- For single comparing - left editor is not editable
