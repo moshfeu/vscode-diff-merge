@@ -1,8 +1,8 @@
 {
   "name": "diff-merge",
-  "displayName": "Diff Merge",
+  "displayName": "Diff & Merge",
   "description": "Show diffs and merge",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "repository": {
     "type": "git",
     "url": "https://github.com/moshfeu/vscode-diff-merge"
@@ -74,11 +74,11 @@
     },
     "commands": [
       {
-        "title": "Choose File to merge",
+        "title": "[Diff & Merge] Choose a file to merge",
         "command": "diffMerge.chooseFile"
       },
       {
-        "title": "Diff & Merge",
+        "title": "[Diff & Merge] Open Changes",
         "command": "diffMerge.scm.file"
       }
     ]

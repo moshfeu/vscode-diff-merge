@@ -1,120 +1,339 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <style>
-    .lds-ellipsis {
-      display: inline-block;
-      position: absolute;
-      width: 80px;
-      height: 80px;
-      top: 0;
-      left: 50%;
-      margin-left: -40px;
-    }
-    .lds-ellipsis div {
-      position: absolute;
-      top: 33px;
-      width: 13px;
-      height: 13px;
-      border-radius: 50%;
-      background: #a2d7f2;
-      animation-timing-function: cubic-bezier(0, 1, 1, 0);
-    }
-    .lds-ellipsis div:nth-child(1) {
-      left: 8px;
-      animation: lds-ellipsis1 0.6s infinite;
-    }
-    .lds-ellipsis div:nth-child(2) {
-      left: 8px;
-      animation: lds-ellipsis2 0.6s infinite;
-    }
-    .lds-ellipsis div:nth-child(3) {
-      left: 32px;
-      animation: lds-ellipsis2 0.6s infinite;
-    }
-    .lds-ellipsis div:nth-child(4) {
-      left: 56px;
-      animation: lds-ellipsis3 0.6s infinite;
-    }
-    @keyframes lds-ellipsis1 {
-      0% {
-        transform: scale(0);
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      /*! Ace-diff | github.com/ace-diff/ace-diff */
+      .acediff__wrap {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-orient: horizontal;
+        -webkit-box-direction: normal;
+        -ms-flex-direction: row;
+        flex-direction: row;
+        position: absolute;
+        bottom: 0;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        overflow: auto;
       }
-      100% {
-        transform: scale(1);
-      }
-    }
-    @keyframes lds-ellipsis3 {
-      0% {
-        transform: scale(1);
-      }
-      100% {
-        transform: scale(0);
-      }
-    }
-    @keyframes lds-ellipsis2 {
-      0% {
-        transform: translate(0, 0);
-      }
-      100% {
-        transform: translate(24px, 0);
-      }
-    }
-  </style>
-</head>
-<body>
-  <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
-  <div class="acediff"></div>
 
-  <link href="https://unpkg.com/ace-diff@^2.0.0/dist/ace-diff.min.css" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.3.3/ace.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.1.3/ext-modelist.js"></script>
-  <script src="https://unpkg.com/ace-diff@^2.0.0"></script>
-  <script>
-    const modelist = ace.require("ace/ext/modelist");
-    const {mode} = modelist.getModeForPath('###path###');
-    const notSupportedFile = '###fileNotSupported###';
-    const leftContent = `###leftContent###`;
-    const rightContent = `###rightContent###`;
+      .acediff__gutter {
+        -webkit-box-flex: 0;
+        -ms-flex: 0 0 60px;
+        flex: 0 0 60px;
+        border-left: 1px solid #bcbcbc;
+        border-right: 1px solid #bcbcbc;
+        overflow: hidden;
+      }
 
-    const vscode = typeof acquireVsCodeApi !== 'undefined' ? acquireVsCodeApi() : window;
-    const differ = new AceDiff({
-      element: '.acediff',
-      mode,
-      showDiffs: leftContent !== notSupportedFile && rightContent !== notSupportedFile,
-      left: {
-        content: leftContent,
-        editable: false,
-        copyLinkEnabled: leftContent !== notSupportedFile,
-      },
-      right: {
-        content: rightContent,
-        editable: rightContent !== notSupportedFile,
-        copyLinkEnabled: false,
-      },
-    });
+      .acediff__gutter,
+      .acediff__gutter svg {
+        background-color: #efefef;
+      }
 
-    const {left, right} = differ.getEditors();
+      .acediff__left,
+      .acediff__right {
+        height: 100%;
+        -webkit-box-flex: 1;
+        -ms-flex: 1;
+        flex: 1;
+      }
 
-    right.on('change', () => {
-      vscode.postMessage({
-        command: 'change',
+      .acediff__diffLine {
+        background-color: #d8f2ff;
+        border-top: 1px solid #a2d7f2;
+        border-bottom: 1px solid #a2d7f2;
+        position: absolute;
+        z-index: 4;
+      }
+
+      .acediff__diffLine.targetOnly {
+        height: 0 !important;
+        border-top: 1px solid #a2d7f2;
+        border-bottom: 0;
+        position: absolute;
+      }
+
+      .acediff__connector {
+        fill: #d8f2ff;
+        stroke: #a2d7f2;
+      }
+
+      .acediff__copy--left,
+      .acediff__copy--right {
+        position: relative;
+      }
+
+      .acediff__copy--left div,
+      .acediff__copy--right div {
+        color: #000;
+        text-shadow: 1px 1px hsla(0, 0%, 100%, 0.7);
+        position: absolute;
+        margin: 2px 3px;
+        cursor: pointer;
+      }
+
+      .acediff__copy--right div:hover {
+        color: #004ea0;
+      }
+
+      .acediff__copy--left {
+        float: right;
+      }
+
+      .acediff__copy--left div {
+        right: 0;
+      }
+
+      .acediff__copy--left div:hover {
+        color: #c98100;
+      }
+
+      .vscode-dark .acediff__wrap {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-orient: horizontal;
+        -webkit-box-direction: normal;
+        -ms-flex-direction: row;
+        flex-direction: row;
+        position: absolute;
+        bottom: 0;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        overflow: auto;
+      }
+
+      .vscode-dark .acediff__gutter {
+        -webkit-box-flex: 0;
+        -ms-flex: 0 0 60px;
+        flex: 0 0 60px;
+        border-left: 1px solid #000;
+        border-right: 1px solid #000;
+        overflow: hidden;
+      }
+
+      .vscode-dark .acediff__gutter,
+      .vscode-dark .acediff__gutter svg {
+        background-color: #272727;
+      }
+
+      .vscode-dark .acediff__left,
+      .vscode-dark .acediff__right {
+        height: 100%;
+        -webkit-box-flex: 1;
+        -ms-flex: 1;
+        flex: 1;
+      }
+
+      .vscode-dark .acediff__diffLine {
+        background-color: #004d7a;
+        border-top: 1px solid #003554;
+        border-bottom: 1px solid #003554;
+        position: absolute;
+        z-index: 4;
+      }
+
+      .vscode-dark .acediff__diffLine.targetOnly {
+        height: 0 !important;
+        border-top: 1px solid #003554;
+        border-bottom: 0;
+        position: absolute;
+      }
+
+      .vscode-dark .acediff__connector {
+        fill: #004d7a;
+        stroke: #003554;
+      }
+
+      .vscode-dark .acediff__copy--left,
+      .vscode-dark .acediff__copy--right {
+        position: relative;
+      }
+
+      .vscode-dark .acediff__copy--left div,
+      .vscode-dark .acediff__copy--right div {
+        color: #fff;
+        text-shadow: 1px 1px rgba(0, 0, 0, 0.7);
+        position: absolute;
+        margin: 2px 3px;
+        cursor: pointer;
+      }
+
+      .vscode-dark .acediff__copy--right div:hover {
+        color: #61a2e7;
+      }
+
+      .vscode-dark .acediff__copy--left {
+        float: right;
+      }
+
+      .vscode-dark .acediff__copy--left div {
+        right: 0;
+      }
+
+      .vscode-dark .acediff__copy--left div:hover {
+        color: #f7b742;
+      }
+
+      .lds-ellipsis {
+        display: inline-block;
+        position: absolute;
+        width: 80px;
+        height: 80px;
+        top: 0;
+        left: 50%;
+        margin-left: -40px;
+      }
+
+      .lds-ellipsis div {
+        position: absolute;
+        top: 33px;
+        width: 13px;
+        height: 13px;
+        border-radius: 50%;
+        background: #a2d7f2;
+        animation-timing-function: cubic-bezier(0, 1, 1, 0);
+      }
+
+      .lds-ellipsis div:nth-child(1) {
+        left: 8px;
+        animation: lds-ellipsis1 0.6s infinite;
+      }
+
+      .lds-ellipsis div:nth-child(2) {
+        left: 8px;
+        animation: lds-ellipsis2 0.6s infinite;
+      }
+
+      .lds-ellipsis div:nth-child(3) {
+        left: 32px;
+        animation: lds-ellipsis2 0.6s infinite;
+      }
+
+      .lds-ellipsis div:nth-child(4) {
+        left: 56px;
+        animation: lds-ellipsis3 0.6s infinite;
+      }
+
+      @keyframes lds-ellipsis1 {
+        0% {
+          transform: scale(0);
+        }
+
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      @keyframes lds-ellipsis3 {
+        0% {
+          transform: scale(1);
+        }
+
+        100% {
+          transform: scale(0);
+        }
+      }
+
+      @keyframes lds-ellipsis2 {
+        0% {
+          transform: translate(0, 0);
+        }
+
+        100% {
+          transform: translate(24px, 0);
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="lds-ellipsis">
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+    <div class="acediff"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.3.3/ace.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.1.3/ext-modelist.js"></script>
+    <script src="https://unpkg.com/ace-diff@^2.0.0"></script>
+    <script>
+      window.addEventListener('message', ({ data: { key, payload } }) => {
+        switch (key) {
+          case 'data':
+            render(payload);
+            break;
+        }
       });
-    });
+      const vscode =
+        typeof acquireVsCodeApi !== 'undefined' ? acquireVsCodeApi() : window;
+      vscode.postMessage({
+        command: 'load'
+      });
 
-    document.addEventListener('keydown', function(e) {
-      if ((window.navigator.platform.match('Mac') ? e.metaKey : e.ctrlKey)  && e.keyCode == 83) {
-        e.preventDefault();
-        vscode.postMessage({
-          command: 'save',
-          contents: {
-            left: left.getValue(),
-            right: right.getValue()
-          }
+      function render({ path, notSupportedFile, leftContent, rightContent }) {
+        const modelist = ace.require('ace/ext/modelist');
+        const { mode } = modelist.getModeForPath(path);
+        const isDarkMode = document.body.classList.contains('vscode-dark');
+
+        const differ = new AceDiff({
+          element: '.acediff',
+          mode,
+          showDiffs:
+            leftContent !== notSupportedFile &&
+            rightContent !== notSupportedFile,
+          left: {
+            content: leftContent,
+            editable: false,
+            copyLinkEnabled: leftContent !== notSupportedFile
+          },
+          right: {
+            content: rightContent,
+            editable: rightContent !== notSupportedFile,
+            copyLinkEnabled: false
+          },
+          theme: isDarkMode ? 'ace/theme/twilight' : undefined
         });
+
+        const { left, right } = differ.getEditors();
+
+        right.on('change', () => {
+          vscode.postMessage({
+            command: 'change'
+          });
+        });
+
+        document.addEventListener(
+          'keydown',
+          function(e) {
+            if (
+              (window.navigator.platform.match('Mac')
+                ? e.metaKey
+                : e.ctrlKey) &&
+              e.keyCode == 83
+            ) {
+              e.preventDefault();
+              vscode.postMessage({
+                command: 'save',
+                contents: {
+                  left: left.getValue(),
+                  right: right.getValue()
+                }
+              });
+            }
+          },
+          false
+        );
       }
-    }, false);
-  </script>
-</body>
+    </script>
+  </body>
 </html>

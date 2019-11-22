@@ -1,13 +1,12 @@
-import { window, ViewColumn, ExtensionContext } from 'vscode';
+import { window, ViewColumn, ExtensionContext, Webview } from 'vscode';
 import { getFilePath } from '../path';
-import { writeFileSync, readFileSync } from 'fs';
+import { writeFileSync } from 'fs';
 import { utf8Stream, UNSAVED_SYMBOL, fileNotSupported } from '../constants';
-import { join } from 'path';
+import { ExtendsWebview } from './extendsWebview';
 import { log } from '../logger';
 
 export function showDiff({ leftContent, rightContent, leftPath, rightPath, context }: { leftContent: string; rightContent: string; leftPath?: string; rightPath: string; context: ExtensionContext; }) {
   try {
-
     const panel = window.createWebviewPanel(
       'mergeDiff.file',
       getTitle(rightPath, leftPath),
@@ -18,17 +17,19 @@ export function showDiff({ leftContent, rightContent, leftPath, rightPath, conte
       }
     );
 
-    const template = getTemplate('diff', context);
-    panel.webview.html = render(template, {
-      path: rightPath,
-      leftContent,
-      rightContent,
-      fileNotSupported
-    });
+    const extendsWebView = new ExtendsWebview(
+      panel.webview,
+      'diff',
+      context,
+      {
+        path: rightPath,
+        leftContent,
+        rightContent,
+        fileNotSupported
+      }
+    );
 
-    log(panel.webview.html);
-
-    panel.webview.onDidReceiveMessage(e => {
+    extendsWebView.onDidReceiveMessage(e => {
       switch (e.command) {
         case 'change':
           if (!panel.title.includes(UNSAVED_SYMBOL)) {
@@ -44,6 +45,8 @@ export function showDiff({ leftContent, rightContent, leftPath, rightPath, conte
           break;
       }
     });
+
+    extendsWebView.render();
   } catch (error) {
     log(error);
   }
@@ -54,11 +57,20 @@ export function showNotSupported(context: ExtensionContext, rightPath: string) {
     'mergeDiff.fileNotSupported',
     getTitle(rightPath),
     ViewColumn.One,
+    {
+      enableScripts: true,
+    }
   );
 
-  panel.webview.html = render(getTemplate('notSupported', context), {
-    content: fileNotSupported
-  });
+  const extendsWebview = new ExtendsWebview(
+    panel.webview,
+    'notSupported',
+    context,
+    {
+      content: fileNotSupported
+    }
+  );
+  extendsWebview.render();
 }
 
 function getTitle(rightPath: string, leftPath?: string) {
@@ -67,15 +79,4 @@ function getTitle(rightPath: string, leftPath?: string) {
   } else {
     return `${getFilePath(rightPath)} (Working Tree)`;
   }
-}
-
-function getTemplate(templateName: 'diff' | 'notSupported', context: ExtensionContext) {
-  return readFileSync(join(context.extensionPath, 'resources', `${templateName}.html`), utf8Stream);
-}
-
-function render(template: string, params: {[key: string]: string}) {
-  const output = template.replace(/###(.*)###/g, (_, exact) => {
-    return params[exact];
-  });
-  return output;
 }

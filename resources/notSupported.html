@@ -9,6 +9,22 @@
   </style>
 </head>
 <body>
-    ###content###
+  <script>
+    window.addEventListener('message', ({data: {key, payload}}) => {
+      switch (key) {
+        case 'data':
+          render(payload);
+          break;
+      }
+    });
+    const vscode = typeof acquireVsCodeApi !== 'undefined' ? acquireVsCodeApi() : window;
+    vscode.postMessage({
+      command: 'load',
+    });
+
+    function render({content}) {
+      document.body.innerHTML = content;
+    }
+  </script>
 </body>
 </html>
