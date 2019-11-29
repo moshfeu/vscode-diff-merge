@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <base href="###base###">
+    <link href="style.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div
+      id="container"
+    ></div>
+
+    <button onclick="diffNavigator.previous()">prev</button>
+    <button onclick="diffNavigator.next()">Next</button>
+
+    <script src="node_modules/monaco-editor/min/vs/loader.js"></script>
+    <script src="utils.js"></script>
+    <script>
+      let diffEditor, diffNavigator;
+      const vscode = typeof acquireVsCodeApi !== 'undefined' ? acquireVsCodeApi() : window.parent;
+      const isDarkMode = document.body.classList.contains('vscode-dark');
+      require.config({ paths: { vs: 'node_modules/monaco-editor/min/vs' } });
+      require(['vs/editor/editor.main'], function() {
+        window.addEventListener('resize', () => {
+          if (diffEditor) {
+            diffEditor.layout();
+          }
+        });
+
+        window.addEventListener('message', (e) => {
+          const { data: { key, payload } } = e;
+          switch (key) {
+            case 'data':
+              render(diffEditor, payload);
+              break;
+          }
+        });
+
+        if (isDarkMode) {
+          monaco.editor.setTheme('vs-dark');
+        }
+
+        diffEditor = monaco.editor.createDiffEditor(
+          document.getElementById('container')
+        );
+
+        vscode.postMessage({
+          command: 'load'
+        });
+
+        diffEditor.onDidUpdateDiff(() => {
+          addDiffActions(diffEditor, diffActionsNode);
+        });
+      });
+    </script>
+  </body>
+</html>

@@ -1,4 +1,4 @@
-import { window, ViewColumn, ExtensionContext, Webview } from 'vscode';
+import { window, ViewColumn, ExtensionContext, Webview, Uri } from 'vscode';
 import { getFilePath } from '../path';
 import { writeFileSync } from 'fs';
 import { utf8Stream, UNSAVED_SYMBOL, fileNotSupported } from '../constants';
@@ -9,7 +9,7 @@ export function showDiff({ leftContent, rightContent, leftPath, rightPath, conte
   try {
     const panel = window.createWebviewPanel(
       'mergeDiff.file',
-      getTitle(rightPath, leftPath),
+      getTitle(rightPath, leftPath, !!leftContent),
       ViewColumn.One,
       {
         enableScripts: true,
@@ -17,12 +17,13 @@ export function showDiff({ leftContent, rightContent, leftPath, rightPath, conte
       }
     );
 
+    const rightPathUri = Uri.parse(rightPath);
     const extendsWebView = new ExtendsWebview(
       panel.webview,
       'diff',
       context,
       {
-        path: rightPath,
+        path: `vscode://${rightPathUri.path}`, // can use any URI schema
         leftContent,
         rightContent,
         fileNotSupported
@@ -73,10 +74,11 @@ export function showNotSupported(context: ExtensionContext, rightPath: string) {
   extendsWebview.render();
 }
 
-function getTitle(rightPath: string, leftPath?: string) {
+function getTitle(rightPath: string, leftPath?: string, leftHasContent: boolean = false) {
   if (leftPath) {
-    return `${getFilePath(leftPath)}↔${getFilePath(rightPath)}`;
+    return `${getFilePath(leftPath)} ↔ ${getFilePath(rightPath)}`;
   } else {
-    return `${getFilePath(rightPath)} (Working Tree)`;
+    const gitStatus = leftHasContent ? 'Working Tree' : 'Untracked';
+    return `${getFilePath(rightPath)} (${gitStatus})`;
   }
 }

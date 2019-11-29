@@ -1,4 +1,4 @@
-import { Webview, Event, ExtensionContext } from 'vscode';
+import { Webview, Event, ExtensionContext, Uri } from 'vscode';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { utf8Stream } from '../constants';
@@ -10,12 +10,16 @@ export class ExtendsWebview {
     private webView: Webview,
     private templateName: 'diff' | 'notSupported',
     private context: ExtensionContext,
-    private params: {[key: string]: string},
+    private params: {[key: string]: any},
   ) {
 
   }
 
   private getTemplate(templateName: 'diff' | 'notSupported', context: ExtensionContext) {
+    if (templateName === 'diff') {
+      return readFileSync(join(context.extensionPath, 'resources', 'monaco', 'index.html'), utf8Stream)
+        .replace('###base###', `${Uri.file(join(context.extensionPath, 'resources', 'monaco')).with({ scheme: 'vscode-resource' })}/`);
+    }
     return readFileSync(join(context.extensionPath, 'resources', `${templateName}.html`), utf8Stream);
   }
 
@@ -31,10 +35,8 @@ export class ExtendsWebview {
           key: 'data',
           payload: this.params
         });
-      } else {
-        if (this._listener) {
-          this._listener(e);
-        }
+      } else if (this._listener) {
+        this._listener(e);
       }
     });
   }

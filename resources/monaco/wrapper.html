@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Monaco</title>
+  <style>
+    body {
+      margin: 0;
+    }
+
+    iframe {
+      border: none;
+      width: 100vw;
+      height: 100vh;
+    }
+  </style>
+</head>
+<body>
+  <select>
+    <option value="0">Add</option>
+    <option value="1">Remove</option>
+    <option value="2">Replace</option>
+    <option value="3">Replace multiline</option>
+    <option value="4">Multiplace actions</option>
+    <option value="5">Long text</option>
+  </select>
+  <iframe scrolling="no" id="wrapper" src="index.html"></iframe>
+  <script>
+    const qs = new URLSearchParams(location.search);
+    const diffs = [
+      {
+        rightContent: `<body>
+  Lorem Ispum
+</body>`,
+        leftContent: `<body>
+  Lorem Ispum
+  <div>
+    Old content
+  </div>
+</body>`
+      },
+      {
+        rightContent: `<body>
+  Lorem Ispum
+  <div>
+    Old content
+  </div>
+</body>`,
+        leftContent: `<body>
+  Lorem Ispum
+</body>`
+      },
+      {
+        rightContent: `<body>
+  Lorem Ispum1
+</body>`,
+        leftContent: `<body>
+  Lorem Ispum
+</body>`
+      },
+      {
+        rightContent: `<body>
+  Lorem Ispum1
+  Lorem Ispum1
+</body>`,
+        leftContent: `<body>
+  Lorem Ispum
+</body>`
+      },
+      {
+        rightContent: `<!DOCTYPE html>
+<html>
+<body>
+
+<h1>My First Heading</h1>
+<hr />
+<p>My first paragraph.</p>
+<div></div>
+</body>
+</html>
+`,
+        leftContent: `<!DOCTYPE html>
+<html>
+<body>
+
+<h1>My First Heading1</h1>
+<hr />
+<p>My first paragrh.
+  aasdfsdf
+  </p>
+<div></div>
+  text text
+</body>
+</html>
+`
+      },
+      {
+        rightContent: `<!DOCTYPE html>
+<html>
+<body>
+
+<h1>My First Heading</h1>
+<hr />
+<p>My first paragraph.</p>
+<div></div>
+</body>
+</html>
+`,
+        leftContent: `<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <base href="###base###">
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      #container {
+        height: 100%;
+      }
+
+      .diffActions {
+        position: absolute;
+        top:0;
+        left: 0;
+        width: 20px;
+        height: 100%;
+      }
+
+      .diffAction {
+        position: absolute;
+        left: 0;
+        background: green;
+        color: white;
+        width: 100%;
+        text-align: center;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="container"
+    ></div>
+
+    <button onclick="diffNavigator.previous()">prev</button>
+    <button onclick="diffNavigator.next()">Next</button>
+
+    <script src="node_modules/monaco-editor/min/vs/loader.js">
+      let diffEditor;
+      const vscode = typeof acquireVsCodeApi !== 'undefined' ? acquireVsCodeApi() : window.parent;
+      require.config({ paths: { vs: 'node_modules/monaco-editor/min/vs' } });
+      require(['vs/editor/editor.main'], function() {
+        window.addEventListener('resize', () => {
+          if (diffEditor) {
+            diffEditor.layout();
+          }
+        });
+
+        window.addEventListener('message', (e) => {
+          const { data: { key, payload } } = e;
+          switch (key) {
+            case 'data':
+              render(diffEditor, payload);
+              break;
+          }
+        });
+
+        diffEditor = monaco.editor.createDiffEditor(
+          document.getElementById('container')
+        );
+
+        // monaco.editor.setTheme('vs-dark');
+        vscode.postMessage({
+          command: 'load'
+        });
+
+        diffEditor.onDidUpdateDiff(() => {
+          addDiffActions(diffEditor, diffActionsNode);
+        });
+      });
+
+      function render(diffEditor, { path, notSupportedFile, leftContent, rightContent }) {
+        diffEditor.setModel({
+          original: monaco.editor.createModel(leftContent, null, path),
+          modified: monaco.editor.createModel(rightContent, path)
+        });
+        diffActionsNode = createDiffActionsContainer(diffEditor);
+        monaco.editor.createDiffNavigator(diffEditor);
+      }
+
+      function addDiffActions(diffEditor, diffActionsNode) {
+        diffActionsNode.innerHTML = '';
+        const changes = diffEditor.getLineChanges();
+        waitForChangesDecorations()
+          .then(() => {
+            changes.forEach(change => {
+              const top = diffEditor.originalEditor.getTopForLineNumber(change.originalStartLineNumber)
+              createDiffAction(diffActionsNode, top, e => {
+                const originalLines = getChangeOriginalValue(change, diffEditor);
+                applyOriginalLines(originalLines, change, diffEditor);
+              });
+            });
+          });
+      }
+
+      function applyOriginalLines(originalLines, change, diffEditor) {
+        const modifiedValue = diffEditor.modifiedEditor.getValue();
+        const newValueLines = modifiedValue.split('\n');
+        const modifiedStartLineNumberInArr = change.modifiedStartLineNumber - 1;
+        const modifiedEndLineNumberInArr = change.modifiedEndLineNumber - 1;
+
+        newValueLines.splice(modifiedStartLineNumberInArr, (modifiedEndLineNumberInArr - modifiedStartLineNumberInArr) + 1, ...originalLines);
+        diffEditor.modifiedEditor.setValue(newValueLines.join('\n'));
+      }
+
+      function getChangeOriginalValue(change, diffEditor) {
+        return diffEditor.originalEditor.getValue().split('\n').slice(change.originalStartLineNumber - 1, change.originalEndLineNumber);
+      }
+
+      function createDiffAction(diffActionsNode, top, onCopy) {
+        const action = document.createElement('div');
+        action.className = 'diffAction';
+        action.innerHTML = '→';
+        action.style.top = "10px";
+        action.addEventListener('click', onCopy);
+        diffActionsNode.appendChild(action);
+      }
+
+      function createDiffActionsContainer(diffEditor) {
+        const modifedEditorNode = diffEditor.modifiedEditor.getDomNode();
+        const diffActions = document.createElement('div');
+        diffActions.className = 'diffActions diffOverview';
+        modifedEditorNode.appendChild(diffActions);
+        return diffActions;
+      }
+
+      function waitForChangesDecorations() {
+        let i;
+        return new Promise((resolve, reject) => {
+          const interval = setInterval(() => {
+            const isDiffApplyed = document.querySelector('.cdr');
+            if (isDiffApplyed) {
+              clearInterval(interval);
+              resolve();
+            } else if (i > 200) {
+              clearInterval(interval);
+              reject();
+            }
+          }, 10);
+        });
+      }
+
+  </body>
+</html>
+`
+      }
+    ];
+
+    const fileNotSupported = 'asdf';
+    const iframe = document.querySelector('#wrapper');
+    window.addEventListener('message', e => {
+      if (e.data.command === 'load') {
+        setDiff(qs.get('opt') || 0);
+      }
+    });
+
+    const select = document.querySelector('select');
+    select.addEventListener('change', e => {
+      location.search = `opt=${e.target.value}`;
+    });
+
+    function setDiff(index) {
+      select.value = index;
+      const {leftContent, rightContent} = diffs[index];
+      iframe.contentWindow.postMessage({
+        key: 'data',
+        payload: {
+          path: 'vscode:///index.html',
+          leftContent,
+          rightContent,
+          fileNotSupported
+        }
+      })
+    }
+  </script>
+</body>
+</html>

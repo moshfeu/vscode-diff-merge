@@ -6,7 +6,7 @@ import { getGitSides, getExplorerSides } from './content';
 export function init(context: ExtensionContext) {
   commands.registerCommand('diffMerge.scm.file', e => {
     try {
-      const rightPath = e.original.fsPath;
+      const rightPath = getFilePath(e.original.fsPath);
       const { leftContent, rightContent } = getGitSides(rightPath);
       if (rightContent) {
         showDiff({ leftContent, rightContent, rightPath, context });
