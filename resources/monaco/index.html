@@ -29,10 +29,17 @@
         });
 
         window.addEventListener('message', (e) => {
+          const { diffNavigator } = window;
           const { data: { key, payload } } = e;
           switch (key) {
             case 'data':
               render(diffEditor, payload);
+              break;
+            case 'nextDiff':
+              diffNavigator.next();
+              break;
+            case 'prevDiff':
+              diffNavigator.previous();
               break;
           }
         });

@@ -2,7 +2,7 @@
   "name": "diff-merge",
   "displayName": "Diff & Merge",
   "description": "Show diffs and merge",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "repository": {
     "type": "git",
     "url": "https://github.com/moshfeu/vscode-diff-merge"
@@ -34,6 +34,7 @@
   ],
   "main": "./out/extension.js",
   "scripts": {
+    "monaco": "http-server resources/monaco",
     "vscode:prepublish": "yarn run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
@@ -71,6 +72,18 @@
           "command": "diffMerge.scm.file"
         }
       ],
+      "editor/title": [
+        {
+          "command": "diffMerge.nextDiff",
+          "group": "navigation@-100",
+          "when": "diffMerge.panelFocused"
+        },
+        {
+          "command": "diffMerge.prevDiff",
+          "group": "navigation@-99",
+          "when": "diffMerge.panelFocused"
+        }
+      ],
       "commandPalette": [
         {
           "command": "diffMerge.chooseFile",
@@ -79,11 +92,48 @@
         {
           "command": "diffMerge.scm.file",
           "when": "false"
+        },
+        {
+          "command": "diffMerge.nextDiff",
+          "when": "diffMerge.panelFocused"
+        },
+        {
+          "command": "diffMerge.prevDiff",
+          "when": "diffMerge.panelFocused"
         }
-
       ]
     },
+    "keybindings": [
+      {
+        "command": "diffMerge.nextDiff",
+        "key": "alt+f5",
+        "when": "diffMerge.panelFocused"
+      },
+      {
+        "command": "diffMerge.prevDiff",
+        "key": "alt+shift+f5",
+        "when": "diffMerge.panelFocused"
+      }
+    ],
     "commands": [
+      {
+        "title": "Next Change",
+        "category": "Diff Merge",
+        "command": "diffMerge.nextDiff",
+        "icon": {
+          "dark": "resources/icons/dark/down-arrow.svg",
+          "light": "resources/icons/light/down-arrow.svg"
+        }
+      },
+      {
+        "title": "Previous Change",
+        "category": "Diff Merge",
+        "command": "diffMerge.prevDiff",
+        "icon": {
+          "dark": "resources/icons/dark/up-arrow.svg",
+          "light": "resources/icons/light/up-arrow.svg"
+        }
+      },
       {
         "title": "[Diff & Merge] Choose a file to merge",
         "command": "diffMerge.chooseFile"

@@ -5,9 +5,10 @@ function render(diffEditor, { path, notSupportedFile, leftContent, rightContent 
     modified: monaco.editor.createModel(rightContent, null, monaco.Uri.parse(`${path}?mod`)) // 3rd arg - fake different path
   });
   diffActionsNode = createDiffActionsContainer(diffEditor);
-  diffNavigator = monaco.editor.createDiffNavigator(diffEditor);
+  window.diffNavigator = monaco.editor.createDiffNavigator(diffEditor);
   diffEditor.modifiedEditor.onDidChangeModelContent(onDidUpdateDiff);
   bindSaveShortcut();
+  extractEditorStyles();
 }
 
 function onDidUpdateDiff() {
@@ -84,7 +85,7 @@ function applyOriginalLines(originalLines, replacer, diffEditor) {
   let {startLine, linesToRemove} = replacer();
   const diff = {
       range: new monaco.Range(++startLine, 0, startLine + linesToRemove, 0),
-      text: `${originalLines.join('\n')}\n`
+      text: originalLines.length ? `${originalLines.join('\n')}\n` : ''
     };
   diffEditor.modifiedEditor.executeEdits('diff-merge', [diff]);
 }
@@ -159,4 +160,8 @@ function bindSaveShortcut() {
   },
   false
   );
+}
+
+function extractEditorStyles() {
+  document.body.style.setProperty('--diff-merge-lineheight', `${diffEditor.modifiedEditor.getConfiguration().lineHeight}px`);
 }

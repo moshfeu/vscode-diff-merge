@@ -1,5 +1,5 @@
-import { workspace } from 'vscode';
 import { relative } from 'path';
+import { workspace } from 'vscode';
 
 export function getRootPath(): string {
   return workspace.workspaceFolders ? workspace.workspaceFolders[0].uri.fsPath : '';

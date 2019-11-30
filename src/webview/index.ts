@@ -1,75 +1,102 @@
-import { window, ViewColumn, ExtensionContext, Webview, Uri } from 'vscode';
-import { getFilePath } from '../path';
-import { writeFileSync } from 'fs';
-import { utf8Stream, UNSAVED_SYMBOL, fileNotSupported } from '../constants';
-import { ExtendsWebview } from './extendsWebview';
+import { join } from 'path';
 import { log } from '../logger';
+import { writeFileSync } from 'fs';
+import { setPanelFocused } from '../context';
+import { getFilePath, getRootPath } from '../path';
+import { setActiveDiffPanelWebview } from './store';
+import { ExtendedWebview } from './extendedWebview';
+import { utf8Stream, fileNotSupported } from '../constants';
+import { window, ViewColumn, ExtensionContext, Uri } from 'vscode';
 
-export function showDiff({ leftContent, rightContent, leftPath, rightPath, context }: { leftContent: string; rightContent: string; leftPath?: string; rightPath: string; context: ExtensionContext; }) {
+interface IDiffData {
+  leftContent: string;
+  rightContent: string;
+  leftPath?: string;
+  rightPath: string;
+  context: ExtensionContext;
+}
+
+const column = ViewColumn.One;
+
+export function showDiff({ leftContent, rightContent, leftPath, rightPath, context }: IDiffData) {
   try {
+    const rightPathUri = Uri.parse(rightPath);
+    const title = getTitle(rightPath, leftPath, !!leftContent);
+    const options = {
+      enableScripts: true,
+      retainContextWhenHidden: true,
+    };
+
     const panel = window.createWebviewPanel(
-      'mergeDiff.file',
-      getTitle(rightPath, leftPath, !!leftContent),
-      ViewColumn.One,
-      {
-        enableScripts: true,
-        retainContextWhenHidden: true,
-      }
+      'diffMerge',
+      title,
+      column,
+      options
     );
 
-    const rightPathUri = Uri.parse(rightPath);
-    const extendsWebView = new ExtendsWebview(
-      panel.webview,
+    const webviewEnv = {
+      path: `vscode://${rightPathUri.path}`, // can use any URI schema
+      leftContent,
+      rightContent,
+      fileNotSupported
+    };
+
+    const extendsWebView = new ExtendedWebview(
+      panel,
       'diff',
       context,
-      {
-        path: `vscode://${rightPathUri.path}`, // can use any URI schema
-        leftContent,
-        rightContent,
-        fileNotSupported
-      }
+      webviewEnv
     );
 
-    extendsWebView.onDidReceiveMessage(e => {
-      switch (e.command) {
-        case 'change':
-          if (!panel.title.includes(UNSAVED_SYMBOL)) {
-            panel.title += UNSAVED_SYMBOL;
-          }
-          break;
-        case 'save':
-          panel.title = panel.title.replace(UNSAVED_SYMBOL, '');
-          const {right: rightContent} = e.contents;
-          writeFileSync(rightPath, rightContent, utf8Stream);
-          break;
-        default:
-          break;
+    extendsWebView.onDidSave(e => {
+      try {
+        const {right: rightContent} = e.contents;
+        const rightFsPath = join(getRootPath(), getFilePath(rightPath));
+        writeFileSync(rightFsPath, rightContent, utf8Stream);
+      } catch (error) {
+        log(`Error: can't save file due "${error}"`);
       }
     });
 
     extendsWebView.render();
+    panel.onDidChangeViewState(e => {
+      setPanelFocused(e.webviewPanel.active);
+      // don't need to worry when it's not active becuase the diff navigator's buttons will be invisible
+      if (e.webviewPanel.active) {
+        setActiveDiffPanelWebview(extendsWebView);
+      }
+    });
+    // ugly, I know. The case is when opening new diff view, with the timeout, the new panel will wait fot the previous panel to set focus out
+    setTimeout(() => {
+      setPanelFocused(true);
+      setActiveDiffPanelWebview(extendsWebView);
+    }, 100);
   } catch (error) {
     log(error);
   }
 }
 
 export function showNotSupported(context: ExtensionContext, rightPath: string) {
+  const title = getTitle(rightPath);
+  const options = {
+    enableScripts: true,
+  };
   const panel = window.createWebviewPanel(
     'mergeDiff.fileNotSupported',
-    getTitle(rightPath),
-    ViewColumn.One,
-    {
-      enableScripts: true,
-    }
+    title,
+    column,
+    options
   );
 
-  const extendsWebview = new ExtendsWebview(
-    panel.webview,
+  const webviewEnv = {
+    content: fileNotSupported
+  };
+
+  const extendsWebview = new ExtendedWebview(
+    panel,
     'notSupported',
     context,
-    {
-      content: fileNotSupported
-    }
+    webviewEnv
   );
   extendsWebview.render();
 }

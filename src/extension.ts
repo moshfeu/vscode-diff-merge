@@ -1,6 +1,6 @@
-import * as vscode from 'vscode';
 import { init } from './commands';
+import { ExtensionContext } from 'vscode';
 
-export function activate(context: vscode.ExtensionContext) {
+export function activate(context: ExtensionContext) {
   init(context);
 }

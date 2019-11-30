@@ -1,8 +1,8 @@
+import { readFileSync } from 'fs';
 import { getRootPath } from './path';
 import { execSync } from 'child_process';
-import { utf8Stream, fileNotSupported } from './constants';
-import { readFileSync } from 'fs';
 import * as istextorbinary from 'istextorbinary';
+import { utf8Stream, fileNotSupported } from './constants';
 
 export function getExplorerSides(leftPath: string, rightPath: string) {
   const leftContent = getContentOrFallback(leftPath) || fileNotSupported;

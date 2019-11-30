@@ -20,9 +20,15 @@ html, body {
 .diffAction {
   position: absolute;
   left: 0;
-  background: green;
-  color: white;
   width: 100%;
   text-align: center;
   cursor: pointer;
+  color: var(--vscode-icon-foreground);
+  opacity: 0.8;
+  height: var(--diff-merge-lineheight);
+  line-height: var(--diff-merge-lineheight);
+}
+
+.diffAction:hover {
+  opacity: 1;
 }
