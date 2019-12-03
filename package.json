@@ -12,7 +12,7 @@
     "diff",
     "diff-merge"
   ],
-  "icon": "",
+  "icon": "resources/icons/icon.png",
   "galleryBanner": {
     "color": "#f5f5f5",
     "theme": "light"
