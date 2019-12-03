@@ -1,11 +1,16 @@
-# Diff & Merge - Alpha version! Not ready for use yet.
+# Diff & Merge - Alpha version!
 
-Show diffs and merge from left side to right side.
+Show diffs and allow to merge from left side to right side.
 
 ✋ **This extension is in very early stage of development. Use on your own risk**
 
 <img width="1381" alt="Diff View" src="https://user-images.githubusercontent.com/3723951/69850196-64d83f80-1287-11ea-9b1b-263c897e9344.png">
 
+👂**I would love to hear your feedback to improve this tool**
+
+Found a bug? Have an extra ordinary idea? Please create an [issue](https://github.com/moshfeu/vscode-diff-merge/issues/new)
+
+🧙‍♂️Notice that I (and seems that many others) couldn't find an easy way to implement such feature. Therefor, the user experience may not be perfect. The colors, fonts, icons, shortcuts and cetera may not be the same as vscode's. I'll do our best to match the experienc though.
 
 ## Features
 
@@ -32,13 +37,6 @@ Show diffs and merge from left side to right side.
 <hr >
 <sup>[1]</sup> - Make sure that the file is text based (not images, binaries, pdfs etc.)
 
-## Change log
-
-#### 0.0.3
-
-- Add diff navigator buttons for navigation between diffs
-
-
 ## To Do
 
 - [x] Show not supported message for not supported files
@@ -49,7 +47,6 @@ Show diffs and merge from left side to right side.
 - [ ] Allow to change the "save" key binding
 - [ ] Focus the tab when asking to compare a file that already open
 - [ ] Add option to ignore files by pattern (?)
-- [ ] Add more themes and try to match vscode current theme with the extension's editor theme
 
 ## Known issues
 
@@ -58,12 +55,26 @@ Show diffs and merge from left side to right side.
 - ~~Action buttons are not scolling with the content (large files)~~
 - ~~Cmd + z is lost after click on action~~
 - ~~File not supported in diff view~~
-- Copy from left deleted lines, replace the row with empty row instead of removing it completely
-- Diff editors theme has different look & feel than current theme
+- ~~Copy from left deleted lines, replace the row with empty row instead of removing it completely~~
 - Context menu shows up for non text based files (binary etc.)
+- Diff editors theme has different look & feel than current theme ([monaco is not fully competiable with vscode theme](https://github.com/Microsoft/monaco-editor/issues/675#issuecomment-363151951))
 - [API limitation] For single comparing - left editor is not editable
+- [API limitation] Draft indication is next to the "x" icon but not on top of it
 - [API limitation] Save is only with ctrl / cmd + s. There is no API to listen to "Save" event or getting the current save key binding
+- [API limitation] File > Save is disabled
 - [API limitation] When moving from dark to light theme, opened windows doesn't refreshed
+
+## Development
+
+1. `yarn`
+1. `cd resources/monaco && yarn`
+
+Hit <kbd>F5</kbd>
+
+To run the diff view directly in the browser
+
+1. `cd resources/monaco && yarn start`
+1. Go to `http://localhost:12345/wrapper.html`
 
 ## Credits
 

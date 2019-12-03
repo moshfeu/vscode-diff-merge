@@ -4,9 +4,10 @@ import { writeFileSync } from 'fs';
 import { setPanelFocused } from '../context';
 import { getFilePath, getRootPath } from '../path';
 import { setActiveDiffPanelWebview } from './store';
-import { ExtendedWebview } from './extendedWebview';
+import { ExtendedWebview, ExtendedWebviewEnv } from './extendedWebview';
 import { utf8Stream, fileNotSupported } from '../constants';
 import { window, ViewColumn, ExtensionContext, Uri } from 'vscode';
+import { extract } from '../theme/extractor';
 
 interface IDiffData {
   leftContent: string;
@@ -18,7 +19,7 @@ interface IDiffData {
 
 const column = ViewColumn.One;
 
-export function showDiff({ leftContent, rightContent, leftPath, rightPath, context }: IDiffData) {
+export async function showDiff({ leftContent, rightContent, leftPath, rightPath, context }: IDiffData) {
   try {
     const rightPathUri = Uri.parse(rightPath);
     const title = getTitle(rightPath, leftPath, !!leftContent);
@@ -34,11 +35,14 @@ export function showDiff({ leftContent, rightContent, leftPath, rightPath, conte
       options
     );
 
-    const webviewEnv = {
+    const theme = await extract();
+
+    const webviewEnv: ExtendedWebviewEnv = {
       path: `vscode://${rightPathUri.path}`, // can use any URI schema
       leftContent,
       rightContent,
-      fileNotSupported
+      fileNotSupported,
+      theme
     };
 
     const extendsWebView = new ExtendedWebview(
@@ -88,7 +92,7 @@ export function showNotSupported(context: ExtensionContext, rightPath: string) {
     options
   );
 
-  const webviewEnv = {
+  const webviewEnv: ExtendedWebviewEnv = {
     content: fileNotSupported
   };
 

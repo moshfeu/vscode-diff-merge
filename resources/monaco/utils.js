@@ -1,5 +1,5 @@
 let cacheActionsLines = [];
-function render(diffEditor, { path, notSupportedFile, leftContent, rightContent }) {
+function render(diffEditor, { path, notSupportedFile, leftContent, rightContent, theme }) {
   diffEditor.setModel({
     original: monaco.editor.createModel(leftContent, null, monaco.Uri.parse(`${path}?org`)), // 3rd arg - fake different path
     modified: monaco.editor.createModel(rightContent, null, monaco.Uri.parse(`${path}?mod`)) // 3rd arg - fake different path
@@ -9,6 +9,7 @@ function render(diffEditor, { path, notSupportedFile, leftContent, rightContent 
   diffEditor.modifiedEditor.onDidChangeModelContent(onDidUpdateDiff);
   bindSaveShortcut();
   extractEditorStyles();
+  setTheme(theme);
 }
 
 function onDidUpdateDiff() {
@@ -164,4 +165,21 @@ function bindSaveShortcut() {
 
 function extractEditorStyles() {
   document.body.style.setProperty('--diff-merge-lineheight', `${diffEditor.modifiedEditor.getConfiguration().lineHeight}px`);
+}
+
+function setTheme(theme) {
+  monaco.editor.defineTheme('vscodeTheme', theme);
+  monaco.editor.setTheme('vscodeTheme');
+}
+
+function retrieveCssVariables() {
+  const isNumber = s => !isNaN(Number(s));
+
+  const htmlTag = document.querySelector('html');
+  const compotedStyle = getComputedStyle(htmlTag);
+
+  return Object.keys(htmlTag.style).filter(isNumber).reduce((ol, ne) => {
+    ol[htmlTag.style[ne]] = compotedStyle.getPropertyValue(htmlTag.style[ne])
+    return ol;
+  }, {})
 }

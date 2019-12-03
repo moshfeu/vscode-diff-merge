@@ -5,6 +5,20 @@ import { readFileSync } from 'fs';
 import { utf8Stream, UNSAVED_SYMBOL } from '../constants';
 import { ExtensionContext, Uri, WebviewPanel } from 'vscode';
 
+interface IExtendedWebviewEnvContentOnly {
+  content: string;
+}
+
+interface IExtendedWebviewEnvDiff {
+  path: string;
+  leftContent: string;
+  rightContent: string;
+  fileNotSupported: string;
+  theme: any;
+}
+
+export type ExtendedWebviewEnv = IExtendedWebviewEnvContentOnly | IExtendedWebviewEnvDiff;
+
 export class ExtendedWebview {
   private _listener?: (e: {[key: string]: any}) => void;
   private _saveListener?: (e: {[key: string]: any}) => void;
