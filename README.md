@@ -4,7 +4,7 @@ Show diffs and allow to merge from left side to right side.
 
 ✋ **This extension is in very early stage of development. Use on your own risk**
 
-<img width="1381" alt="Diff View" src="https://user-images.githubusercontent.com/3723951/69850196-64d83f80-1287-11ea-9b1b-263c897e9344.png">
+<img width="1061" alt="Screen Shot 2019-12-04 at 20 18 22" src="https://user-images.githubusercontent.com/3723951/70169375-5b116a80-16d3-11ea-800e-99fd941a1bd8.png">
 
 👂**I would love to hear your feedback to improve this tool**
 
@@ -39,9 +39,6 @@ Found a bug? Have an extra ordinary idea? Please create an [issue](https://githu
 
 ## To Do
 
-- [x] Show not supported message for not supported files
-- [x] Dark mode
-- [x] Add diff navigator buttons for navigation between diffs
 - [ ] Add save button next to the diff navigator buttons
 - [ ] Add "Go to original file" next to the save button
 - [ ] Allow to change the "save" key binding
@@ -50,12 +47,6 @@ Found a bug? Have an extra ordinary idea? Please create an [issue](https://githu
 
 ## Known issues
 
-- ~~Word diffing~~
-- ~~Scroll locking (while scrolling, scroll the other editor)~~
-- ~~Action buttons are not scolling with the content (large files)~~
-- ~~Cmd + z is lost after click on action~~
-- ~~File not supported in diff view~~
-- ~~Copy from left deleted lines, replace the row with empty row instead of removing it completely~~
 - Context menu shows up for non text based files (binary etc.)
 - Diff editors theme has different look & feel than current theme ([monaco is not fully competiable with vscode theme](https://github.com/Microsoft/monaco-editor/issues/675#issuecomment-363151951))
 - [API limitation] For single comparing - left editor is not editable
