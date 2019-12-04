@@ -4,6 +4,15 @@ import { execSync } from 'child_process';
 import * as istextorbinary from 'istextorbinary';
 import { utf8Stream, fileNotSupported } from './constants';
 
+const pathDescription: RegExp = /((.|\n|\r)*)@@\n/g;
+const pathNewline: RegExp = /\\ No newline at end of file\n/;
+const lastEmptyLine: RegExp = /\n.*$/;
+const addedLine: RegExp = /^\+.*[\r\n]*/gm;
+const removedLine: RegExp = /^\-.*[\r\n]*/gm;
+const addedLineDiffSynmbol: RegExp = /^\+/gm;
+const removeLineDiffSynmbol: RegExp = /^-/gm;
+const diffIndentation: RegExp = /^ /gm;
+
 export function getExplorerSides(leftPath: string, rightPath: string) {
   const leftContent = getContentOrFallback(leftPath) || fileNotSupported;
   const rightContent = getContentOrFallback(rightPath) || fileNotSupported;
@@ -23,17 +32,19 @@ export function getGitSides(path: string) {
 
     if (patch) {
       const onlyCode = patch
-        // clear pathc descrition
-        .replace(/((.|\n|\r)*)@@\n/g, '')
-        // clean path newline
-        .replace(/\\ No newline at end of file\n/, '')
-        // clean patch indentation
-        .replace(/^ /gm, '')
-        // remove last line of ""
-        .replace(/\n.*$/, '');
+        .replace(pathDescription, '')
+        .replace(pathNewline, '')
+        .replace(lastEmptyLine, '');
 
-      leftContent = onlyCode.replace(/^\+.*\n/gm, '').replace(/^-/gm, '');
-      rightContent = onlyCode.replace(/^\-.*\n/gm, '').replace(/^\+/gm, '');
+      leftContent = onlyCode
+        .replace(addedLine, '')
+        .replace(removeLineDiffSynmbol, '')
+        .replace(diffIndentation, '');
+
+      rightContent = onlyCode
+        .replace(removedLine, '')
+        .replace(addedLineDiffSynmbol, '')
+        .replace(diffIndentation, '');
     } else {
       rightContent = getContentOrFallback(`${rootPath}/${path}`);
     }
