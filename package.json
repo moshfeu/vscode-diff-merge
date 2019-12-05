@@ -2,7 +2,7 @@
   "name": "diff-merge",
   "displayName": "Diff & Merge",
   "description": "Show diffs and merge",
-  "version": "0.0.1",
+  "version": "0.0.6",
   "repository": {
     "type": "git",
     "url": "https://github.com/moshfeu/vscode-diff-merge"
@@ -34,14 +34,15 @@
   ],
   "main": "./out/extension.js",
   "scripts": {
-    "monaco": "http-server resources/monaco",
+    "monaco": "http-server -p 12345 resources/monaco",
     "vscode:prepublish": "yarn run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "pretest": "yarn run compile",
     "test": "node ./out/test/runTest.js",
-    "package": "vsce package",
-    "deploy": "vsce publish -p"
+    "package": "yarn remove-monaco-extras && vsce package",
+    "deploy": "vsce publish -p",
+    "remove-monaco-extras": "rm -rf resources/monaco/node_modules/monaco-editor/esm resources/monaco/node_modules/monaco-editor/dev/ resources/monaco/node_modules/monaco-editor/min-maps"
   },
   "devDependencies": {
     "@types/glob": "^7.1.1",
@@ -87,7 +88,7 @@
       "commandPalette": [
         {
           "command": "diffMerge.chooseFile",
-          "when": "false"
+          "when": "editorIsOpen"
         },
         {
           "command": "diffMerge.scm.file",
@@ -137,6 +138,10 @@
       {
         "title": "[Diff & Merge] Choose a file to merge",
         "command": "diffMerge.chooseFile"
+      },
+      {
+        "title": "[Diff & Merge] Blank diff view",
+        "command": "diffMerge.blank"
       },
       {
         "title": "[Diff & Merge] Open Changes",

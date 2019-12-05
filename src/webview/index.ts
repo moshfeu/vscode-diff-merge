@@ -1,13 +1,13 @@
-import { join } from 'path';
 import { log } from '../logger';
 import { writeFileSync } from 'fs';
 import { setPanelFocused } from '../context';
-import { getFilePath, getRootPath } from '../path';
+import { getSafeFsPath } from '../path';
 import { setActiveDiffPanelWebview } from './store';
-import { ExtendedWebview, ExtendedWebviewEnv } from './extendedWebview';
+import { ExtendedWebview, ExtendedWebviewEnv, IExtendedWebviewEnvDiff } from './extendedWebview';
 import { utf8Stream, fileNotSupported } from '../constants';
-import { window, ViewColumn, ExtensionContext, Uri } from 'vscode';
+import { window, ViewColumn, ExtensionContext } from 'vscode';
 import { extract } from '../theme/extractor';
+import { getTitle } from './utils';
 
 interface IDiffData {
   leftContent: string;
@@ -21,8 +21,6 @@ const column = ViewColumn.One;
 
 export async function showDiff({ leftContent, rightContent, leftPath, rightPath, context }: IDiffData) {
   try {
-    const rightPathUri = Uri.parse(rightPath);
-    const title = getTitle(rightPath, leftPath, !!leftContent);
     const options = {
       enableScripts: true,
       retainContextWhenHidden: true,
@@ -30,7 +28,7 @@ export async function showDiff({ leftContent, rightContent, leftPath, rightPath,
 
     const panel = window.createWebviewPanel(
       'diffMerge',
-      title,
+      '',
       column,
       options
     );
@@ -38,7 +36,8 @@ export async function showDiff({ leftContent, rightContent, leftPath, rightPath,
     const theme = await extract();
 
     const webviewEnv: ExtendedWebviewEnv = {
-      path: `vscode://${rightPathUri.path}`, // can use any URI schema
+      leftPath,
+      rightPath,
       leftContent,
       rightContent,
       fileNotSupported,
@@ -49,16 +48,22 @@ export async function showDiff({ leftContent, rightContent, leftPath, rightPath,
       panel,
       'diff',
       context,
-      webviewEnv
+      webviewEnv,
+      'file',
     );
 
-    extendsWebView.onDidSave(e => {
+    extendsWebView.onDidSave(async (e: SaveEvent, env: IExtendedWebviewEnvDiff) => {
       try {
         const {right: rightContent} = e.contents;
-        const rightFsPath = join(getRootPath(), getFilePath(rightPath));
-        writeFileSync(rightFsPath, rightContent, utf8Stream);
+        const savedRightPath = await getSaveRightPath(env.rightPath);
+        if (savedRightPath) {
+          writeFileSync(getSafeFsPath(savedRightPath), rightContent, utf8Stream);
+          return savedRightPath;
+        }
+        return '';
       } catch (error) {
         log(`Error: can't save file due "${error}"`);
+        return '';
       }
     });
 
@@ -80,8 +85,18 @@ export async function showDiff({ leftContent, rightContent, leftPath, rightPath,
   }
 }
 
-export function showNotSupported(context: ExtensionContext, rightPath: string) {
-  const title = getTitle(rightPath);
+async function getSaveRightPath(path: string): Promise<string> {
+  if (!path) {
+    const uri = await window.showSaveDialog({});
+    if (uri) {
+      path = uri.fsPath;
+    }
+  }
+  return path;
+}
+
+export function showNotSupported(context: ExtensionContext, rightPath: string, mode: ExtendedWebviewMode) {
+  const title = getTitle(rightPath, mode);
   const options = {
     enableScripts: true,
   };
@@ -103,13 +118,4 @@ export function showNotSupported(context: ExtensionContext, rightPath: string) {
     webviewEnv
   );
   extendsWebview.render();
-}
-
-function getTitle(rightPath: string, leftPath?: string, leftHasContent: boolean = false) {
-  if (leftPath) {
-    return `${getFilePath(leftPath)} ↔ ${getFilePath(rightPath)}`;
-  } else {
-    const gitStatus = leftHasContent ? 'Working Tree' : 'Untracked';
-    return `${getFilePath(rightPath)} (${gitStatus})`;
-  }
 }

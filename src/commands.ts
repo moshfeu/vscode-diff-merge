@@ -6,9 +6,14 @@ import { commands, window, Uri, ExtensionContext } from 'vscode';
 
 export function init(context: ExtensionContext) {
   commands.registerCommand('diffMerge.scm.file', gitDiff);
+  commands.registerCommand('diffMerge.blank', blank);
   commands.registerCommand('diffMerge.chooseFile', fileDiff);
   commands.registerCommand('diffMerge.nextDiff', nextDiff);
   commands.registerCommand('diffMerge.prevDiff', prevDiff);
+
+  function blank() {
+    showDiff({ leftContent: '', rightContent: '', rightPath: '', context });
+  }
 
   function gitDiff(e: {original: Uri}) {
     try {
@@ -17,7 +22,7 @@ export function init(context: ExtensionContext) {
       if (rightContent) {
         showDiff({ leftContent, rightContent, rightPath, context });
       } else {
-        showNotSupported(context, rightPath);
+        showNotSupported(context, rightPath, 'git');
       }
     } catch (error) {
       console.error(error);
@@ -28,7 +33,8 @@ export function init(context: ExtensionContext) {
     const file = await window.showOpenDialog({});
     if (file) {
       const { fsPath: leftPath } = file[0];
-      const { fsPath: rightPath } = e;
+      const { fsPath: currentPath } = e;
+      const rightPath = currentPath ? Uri.parse(currentPath).path : '';
 
       const { leftContent, rightContent } = getExplorerSides(leftPath, rightPath);
       showDiff({ leftContent, rightContent, leftPath, rightPath, context });

@@ -24,7 +24,6 @@
     <option value="2">Replace</option>
     <option value="3">Replace multiline</option>
     <option value="4">Multiplace actions</option>
-    <option value="5">Long text</option>
   </select>
   <iframe scrolling="no" id="wrapper" src="index.html"></iframe>
   <script>
@@ -70,7 +69,7 @@
 </body>`
       },
       {
-        rightContent: `<!DOCTYPE html>
+        leftContent: `<!DOCTYPE html>
 <html>
 <body>
 
@@ -79,8 +78,18 @@
 <p>My first paragraph.</p>
 <div></div>
 </body>
-</html>
-`}
+</html>`,
+        rightContent: `<!DOCTYPE html>
+<html>
+<body>
+
+<h1>My Second Heading</h1>
+<hr />
+<p>My second paragraph.</p>
+<div></div>
+New content 🤪
+</body>
+</html>`}
     ];
 
     const fileNotSupported = 'asdf';
@@ -102,7 +111,7 @@
       iframe.contentWindow.postMessage({
         key: 'data',
         payload: {
-          path: 'vscode:///index.html',
+          rightPath: 'index.html',
           leftContent,
           rightContent,
           fileNotSupported

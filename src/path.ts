@@ -1,4 +1,4 @@
-import { relative } from 'path';
+import { relative, isAbsolute } from 'path';
 import { workspace } from 'vscode';
 
 export function getRootPath(): string {
@@ -10,4 +10,11 @@ export function getFilePath(path: string): string {
     return relative(workspace.workspaceFolders[0].uri.fsPath, path);
   }
   return path;
+}
+
+export function getSafeFsPath(path: string): string {
+  if (isAbsolute(path)) {
+    return path;
+  }
+  return `${getRootPath()}/${getFilePath(path)}`;
 }

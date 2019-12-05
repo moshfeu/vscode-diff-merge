@@ -1,9 +1,10 @@
 import { Webview } from 'vscode';
+import { ExtendedWebviewEnv } from './extendedWebview';
 
 export class API {
   constructor(private webView: Webview) {}
 
-  sendPayload(payload: {[key: string]: any}) {
+  sendPayload(payload: ExtendedWebviewEnv) {
     this.webView.postMessage({
       key: 'data',
       payload

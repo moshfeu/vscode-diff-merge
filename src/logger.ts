@@ -8,4 +8,5 @@ export function log(data: object | string) {
   } else {
     logger.appendLine(JSON.stringify(data, null, 2));
   }
+  console.log(data);
 }

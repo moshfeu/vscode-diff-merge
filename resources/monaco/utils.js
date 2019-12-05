@@ -1,8 +1,8 @@
 let cacheActionsLines = [];
-function render(diffEditor, { path, notSupportedFile, leftContent, rightContent, theme }) {
+function render(diffEditor, { rightPath, notSupportedFile, leftContent, rightContent, theme }) {
   diffEditor.setModel({
-    original: monaco.editor.createModel(leftContent, null, monaco.Uri.parse(`${path}?org`)), // 3rd arg - fake different path
-    modified: monaco.editor.createModel(rightContent, null, monaco.Uri.parse(`${path}?mod`)) // 3rd arg - fake different path
+    original: monaco.editor.createModel(leftContent, null, generateMonacoFakeUri(rightPath, 'org')),
+    modified: monaco.editor.createModel(rightContent, null, generateMonacoFakeUri(rightPath, 'mod'))
   });
   diffActionsNode = createDiffActionsContainer(diffEditor);
   window.diffNavigator = monaco.editor.createDiffNavigator(diffEditor);
@@ -10,6 +10,16 @@ function render(diffEditor, { path, notSupportedFile, leftContent, rightContent,
   bindSaveShortcut();
   extractEditorStyles();
   setTheme(theme);
+  diffEditor.originalEditor.updateOptions({
+    readOnly: false
+  });
+}
+
+function generateMonacoFakeUri(path, qs) {
+  if (path) {
+    return monaco.Uri.parse(`vscode://${path || '/'}?${qs}`)
+  }
+  return null;
 }
 
 function onDidUpdateDiff() {
@@ -86,13 +96,16 @@ function applyOriginalLines(originalLines, replacer, diffEditor) {
   let {startLine, linesToRemove} = replacer();
   const diff = {
       range: new monaco.Range(++startLine, 0, startLine + linesToRemove, 0),
-      text: originalLines.length ? `${originalLines.join('\n')}\n` : ''
+      text: originalLines
     };
   diffEditor.modifiedEditor.executeEdits('diff-merge', [diff]);
 }
 
 function getChangeOriginalValue(change, diffEditor) {
-  return diffEditor.originalEditor.getValue().split('\n').slice(change.originalStartLineNumber - 1, change.originalEndLineNumber);
+  return diffEditor.originalEditor.getValue()
+                                  .split(/(?<=[\n|\r])/gm)
+                                  .slice(change.originalStartLineNumber - 1, change.originalEndLineNumber)
+                                  .join('');
 }
 
 function createOrUpdateDiffAction(diffActionsNode, top, onCopy) {
@@ -168,6 +181,9 @@ function extractEditorStyles() {
 }
 
 function setTheme(theme) {
+  if (!theme) {
+    return;
+  }
   monaco.editor.defineTheme('vscodeTheme', theme);
   monaco.editor.setTheme('vscodeTheme');
 }
