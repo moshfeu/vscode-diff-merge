@@ -103,7 +103,7 @@ function applyOriginalLines(originalLines, replacer, diffEditor) {
 
 function getChangeOriginalValue(change, diffEditor) {
   return diffEditor.originalEditor.getValue()
-                                  .split(/(?<=[\n|\r])/gm)
+                                  .split(/(?<=[\n\r])/gm)
                                   .slice(change.originalStartLineNumber - 1, change.originalEndLineNumber)
                                   .join('');
 }

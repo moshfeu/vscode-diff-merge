@@ -38,13 +38,13 @@ export function getGitSides(path: string) {
 
       leftContent = onlyCode
         .replace(addedLine, '')
-        .replace(diffIndentation, '')
-        .replace(removeLineDiffSynmbol, '');
+        .replace(removeLineDiffSynmbol, ' ')
+        .replace(diffIndentation, '');
 
       rightContent = onlyCode
         .replace(removedLine, '')
-        .replace(diffIndentation, '')
-        .replace(addedLineDiffSynmbol, '');
+        .replace(addedLineDiffSynmbol, ' ')
+        .replace(diffIndentation, '');
     } else {
       rightContent = getContentOrFallback(`${rootPath}/${path}`);
     }

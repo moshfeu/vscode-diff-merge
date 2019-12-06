@@ -37,6 +37,15 @@ Found a bug? Have an extra ordinary idea? Please create an [issue](https://githu
 <hr >
 <sup>[1]</sup> - Make sure that the file is text based (not images, binaries, pdfs etc.)
 
+
+### 3. Diff and merge - from scratch
+
+**How to use?**
+
+1. Open commmand palette (<kbd>Command / Ctrl</kbd> + <kdb>Shift</kbd>) + <kbd>P</kbd>)
+1. Search for `[Diff & Merge] Blank diff view`
+1. An open diff view will open so no you can just paste a code in each side and compare
+
 ## To Do
 
 - [ ] Add save button next to the diff navigator buttons
@@ -49,6 +58,7 @@ Found a bug? Have an extra ordinary idea? Please create an [issue](https://githu
 
 - Context menu shows up for non text based files (binary etc.)
 - Diff editors theme has different look & feel than current theme ([monaco is not fully competiable with vscode theme](https://github.com/Microsoft/monaco-editor/issues/675#issuecomment-363151951))
+- Left editor can be edited (to allow copy/paste for example) but can't saved
 - [API limitation] For single comparing - left editor is not editable
 - [API limitation] Draft indication is next to the "x" icon but not on top of it
 - [API limitation] Save is only with ctrl / cmd + s. There is no API to listen to "Save" event or getting the current save key binding
