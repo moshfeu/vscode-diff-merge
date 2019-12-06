@@ -42,9 +42,9 @@ Found a bug? Have an extra ordinary idea? Please create an [issue](https://githu
 
 **How to use?**
 
-1. Open commmand palette (<kbd>Command / Ctrl</kbd> + <kdb>Shift</kbd>) + <kbd>P</kbd>)
+1. Open commmand palette (<kbd>Command / Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd>)
 1. Search for `[Diff & Merge] Blank diff view`
-1. An open diff view will open so no you can just paste a code in each side and compare
+1. An empty diff view will opened. Paste a code in both of sides and compare
 
 ## To Do
 
