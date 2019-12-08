@@ -1,5 +1,8 @@
 let cacheActionsLines = [];
-function render(diffEditor, { rightPath, notSupportedFile, leftContent, rightContent, theme }) {
+let diffActionsNode, diffEditor;
+
+export function render(_diffEditor, { rightPath, notSupportedFile, leftContent, rightContent, theme }) {
+  diffEditor = _diffEditor;
   diffEditor.setModel({
     original: monaco.editor.createModel(leftContent, null, generateMonacoFakeUri(rightPath, 'org')),
     modified: monaco.editor.createModel(rightContent, null, generateMonacoFakeUri(rightPath, 'mod'))
@@ -8,7 +11,7 @@ function render(diffEditor, { rightPath, notSupportedFile, leftContent, rightCon
   window.diffNavigator = monaco.editor.createDiffNavigator(diffEditor);
   diffEditor.modifiedEditor.onDidChangeModelContent(onDidUpdateDiff);
   bindSaveShortcut();
-  extractEditorStyles();
+  extractEditorStyles(diffEditor);
   setTheme(theme);
   diffEditor.originalEditor.updateOptions({
     readOnly: false
@@ -17,7 +20,8 @@ function render(diffEditor, { rightPath, notSupportedFile, leftContent, rightCon
 
 function generateMonacoFakeUri(path, qs) {
   if (path) {
-    return monaco.Uri.parse(`vscode://${path || '/'}?${qs}`)
+    const prefixPath = path.startsWith('/') ? '' : '/';
+    return monaco.Uri.parse(`vscode://${prefixPath}${path}?${qs}`)
   }
   return null;
 }
@@ -28,7 +32,7 @@ function onDidUpdateDiff() {
   });
 }
 
-function addDiffActions(diffEditor, diffActionsNode) {
+export function addDiffActions(diffEditor) {
   const changes = diffEditor.getLineChanges();
   waitForChangesDecorations()
     .then(() => {
@@ -176,7 +180,7 @@ function bindSaveShortcut() {
   );
 }
 
-function extractEditorStyles() {
+function extractEditorStyles(diffEditor) {
   document.body.style.setProperty('--diff-merge-lineheight', `${diffEditor.modifiedEditor.getConfiguration().lineHeight}px`);
 }
 

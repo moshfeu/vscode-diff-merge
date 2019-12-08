@@ -37,10 +37,11 @@
     "monaco": "http-server -p 12345 resources/monaco",
     "vscode:prepublish": "yarn run compile",
     "compile": "tsc -p ./",
+    "webview:watch": "cd resources/monaco && yarn build:dev",
     "watch": "tsc -watch -p ./",
     "pretest": "yarn run compile",
     "test": "node ./out/test/runTest.js",
-    "package": "yarn remove-monaco-extras && vsce package",
+    "package": "bash scripts/package.sh",
     "deploy": "vsce publish -p",
     "remove-monaco-extras": "rm -rf resources/monaco/node_modules/monaco-editor/esm resources/monaco/node_modules/monaco-editor/dev/ resources/monaco/node_modules/monaco-editor/min-maps"
   },

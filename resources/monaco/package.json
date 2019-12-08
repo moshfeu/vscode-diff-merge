@@ -4,12 +4,19 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "http-server -p 12345"
+    "start": "http-server -p 12345",
+    "build": "webpack",
+    "build:dev": "webpack --config webpack.config.dev.js --watch"
   },
   "dependencies": {
-    "monaco-editor": "0.18.1"
+    "monaco-editor": "^0.18.1"
   },
   "devDependencies": {
-    "http-server": "^0.12.0"
+    "css-loader": "^3.2.1",
+    "http-server": "^0.12.0",
+    "style-loader": "^1.0.1",
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.10",
+    "webpack-merge": "^4.2.2"
   }
 }

@@ -68,13 +68,14 @@ Found a bug? Have an extra ordinary idea? Please create an [issue](https://githu
 ## Development
 
 1. `yarn`
-1. `cd resources/monaco && yarn`
+1. `yarn webview:watch`
 
 Hit <kbd>F5</kbd>
 
 To run the diff view directly in the browser
 
-1. `cd resources/monaco && yarn start`
+1. `yarn webview:watch`
+1. `yarn monaco` (in different terminal)
 1. Go to `http://localhost:12345/wrapper.html`
 
 ## Credits
