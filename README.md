@@ -82,3 +82,22 @@ To run the diff view directly in the browser
 ## Credits
 
 <div>Icons made by <a href="https://www.flaticon.com/authors/pixel-perfect" title="Pixel perfect">Pixel perfect</a> from <a href="https://www.flaticon.com/"     title="Flaticon">www.flaticon.com</a></div>
+
+## Thanks
+
+<table>
+  <tr>
+    <td><img width="28" src="https://avatars1.githubusercontent.com/u/198677?s=28&v=4" /></td>
+    <td><a href="https://github.com/evilrix">@evilrix</a></td>
+  </tr>
+  <tr>
+    <td><img width="28" src="https://avatars1.githubusercontent.com/u/499317?s=28&v=4" /></td>
+    <td><a href="https://github.com/bedge">@bedge</a></td>
+  </tr>
+  <tr>
+    <td><img width="28" src="https://avatars1.githubusercontent.com/u/725456?s=28&v=4" /></td>
+    <td><a href="@nemchik">@evilrix</a></td>
+  </tr>
+</table>
+
+I would love to have you in this list :)
