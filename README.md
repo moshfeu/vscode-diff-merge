@@ -59,6 +59,7 @@ Found a bug? Have an extra ordinary idea? Please create an [issue](https://githu
 - Context menu shows up for non text based files (binary etc.)
 - Diff editors theme has different look & feel than current theme ([monaco is not fully competiable with vscode theme](https://github.com/Microsoft/monaco-editor/issues/675#issuecomment-363151951))
 - Left editor can be edited (to allow copy/paste for example) but can't saved
+- When first comparing, the theme configuration file appearing for a moment - meant to retrive theme variables for the diff view theme
 - [API limitation] For single comparing - left editor is not editable
 - [API limitation] Draft indication is next to the "x" icon but not on top of it
 - [API limitation] Save is only with ctrl / cmd + s. There is no API to listen to "Save" event or getting the current save key binding
