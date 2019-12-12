@@ -42,8 +42,7 @@
     "pretest": "yarn run compile",
     "test": "node ./out/test/runTest.js",
     "package": "bash scripts/package.sh",
-    "deploy": "vsce publish -p",
-    "remove-monaco-extras": "rm -rf resources/monaco/node_modules/monaco-editor/esm resources/monaco/node_modules/monaco-editor/dev/ resources/monaco/node_modules/monaco-editor/min-maps"
+    "deploy": "yarn package && vsce publish -p"
   },
   "devDependencies": {
     "@types/glob": "^7.1.1",
