@@ -10,6 +10,7 @@ export function init(context: ExtensionContext) {
   commands.registerCommand('diffMerge.chooseFile', fileDiff);
   commands.registerCommand('diffMerge.nextDiff', nextDiff);
   commands.registerCommand('diffMerge.prevDiff', prevDiff);
+  commands.registerCommand('diffMerge.compareSelected', fileDiff);
 
   function blank() {
     showDiff({ leftContent: '', rightContent: '', rightPath: '', context });
@@ -29,11 +30,19 @@ export function init(context: ExtensionContext) {
     }
   }
 
-  async function fileDiff(e: Uri) {
-    const file = await window.showOpenDialog({});
-    if (file) {
-      const { fsPath: leftPath } = file[0];
-      const { fsPath: currentPath } = e;
+  async function fileDiff(e: Uri, list?: Uri[]) {
+    let leftPath, currentPath;
+    if (list) {
+      ([leftPath, currentPath] = list.map(p => p.fsPath));
+    } else {
+      const file = await window.showOpenDialog({});
+      if (file) {
+        ({ fsPath: leftPath } = file[0]);
+        ({ fsPath: currentPath } = e);
+      }
+    }
+
+    if (leftPath && currentPath) {
       const rightPath = currentPath ? Uri.parse(currentPath).path : '';
 
       const { leftContent, rightContent } = getExplorerSides(leftPath, rightPath);
