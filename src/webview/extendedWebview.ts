@@ -58,6 +58,17 @@ export class ExtendedWebview {
     this._saveListener = listener;
   }
 
+  swap() {
+    if ('leftPath' in this.params) {
+      const { leftPath } = this.params;
+      this.params.leftPath = this.params.rightPath;
+      this.params.rightPath = leftPath as string;
+
+      this.setPanelTitle();
+      this.api.sendSwap();
+    }
+  }
+
   private getTemplate() {
     if (this.templateName === 'diff') {
       const path = join(this.context.extensionPath, 'resources', 'monaco', 'index.html');

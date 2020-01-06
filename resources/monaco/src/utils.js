@@ -18,6 +18,18 @@ export function render(_diffEditor, { rightPath, notSupportedFile, leftContent, 
   });
 }
 
+function setEditorValue(editor, value) {
+  editor.getModel().setValue(value);
+}
+
+export function swap() {
+  const { originalEditor, modifiedEditor } = diffEditor;
+  const leftValue = originalEditor.getValue();
+  const rightValue = modifiedEditor.getValue();
+  setEditorValue(originalEditor, rightValue);
+  setEditorValue(modifiedEditor, leftValue);
+}
+
 function generateMonacoFakeUri(path, qs) {
   if (path) {
     const prefixPath = path.startsWith('/') ? '' : '/';

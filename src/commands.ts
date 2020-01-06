@@ -11,6 +11,7 @@ export function init(context: ExtensionContext) {
   commands.registerCommand('diffMerge.nextDiff', nextDiff);
   commands.registerCommand('diffMerge.prevDiff', prevDiff);
   commands.registerCommand('diffMerge.compareSelected', fileDiff);
+  commands.registerCommand('diffMerge.swap', swap);
 
   function blank() {
     showDiff({ leftContent: '', rightContent: '', rightPath: '', context });
@@ -58,5 +59,10 @@ export function init(context: ExtensionContext) {
   function prevDiff() {
     const webview = getActiveDiffPanelWebview();
     webview.api.sendPrevDiff();
+  }
+
+  function swap() {
+    const webview = getActiveDiffPanelWebview();
+    webview.swap();
   }
 }

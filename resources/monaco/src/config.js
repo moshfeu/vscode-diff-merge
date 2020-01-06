@@ -1,4 +1,4 @@
-self.vscode = acquireVsCodeApi ? acquireVsCodeApi() : self.parent;
+self.vscode = typeof acquireVsCodeApi !== 'undefined' ? acquireVsCodeApi() : self.parent;
 
 self.MonacoEnvironment = {
   getWorkerUrl: function (moduleId, label) {

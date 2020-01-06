@@ -2,7 +2,7 @@
   "name": "diff-merge",
   "displayName": "Diff & Merge",
   "description": "Show diffs and merge",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/moshfeu/vscode-diff-merge"
@@ -80,6 +80,11 @@
       ],
       "editor/title": [
         {
+          "command": "diffMerge.swap",
+          "group": "navigation@-101",
+          "when": "diffMerge.panelFocused"
+        },
+        {
           "command": "diffMerge.nextDiff",
           "group": "navigation@-100",
           "when": "diffMerge.panelFocused"
@@ -138,6 +143,15 @@
         "icon": {
           "dark": "resources/icons/dark/up-arrow.svg",
           "light": "resources/icons/light/up-arrow.svg"
+        }
+      },
+      {
+        "title": "Swap sides",
+        "category": "Diff Merge",
+        "command": "diffMerge.swap",
+        "icon": {
+          "dark": "resources/icons/dark/swap.svg",
+          "light": "resources/icons/light/swap.svg"
         }
       },
       {

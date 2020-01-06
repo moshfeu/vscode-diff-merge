@@ -3,7 +3,7 @@ import './style.css';
 
 import * as monaco from 'monaco-editor';
 
-import {render, addDiffActions} from './utils';
+import {render, addDiffActions, swap} from './utils';
 
 const diffEditor = monaco.editor.createDiffEditor(
   document.getElementById('container')
@@ -29,6 +29,9 @@ self.addEventListener('message', e => {
       break;
     case 'prevDiff':
       diffNavigator.previous();
+      break;
+    case 'swap':
+      swap();
       break;
   }
 });
