@@ -1,5 +1,5 @@
 let cacheActionsLines = [];
-let diffActionsNode, diffEditor;
+let diffActionsNode, diffEditor, ignoreChange = false;
 
 export function render(_diffEditor, { rightPath, notSupportedFile, leftContent, rightContent, theme }) {
   diffEditor = _diffEditor;
@@ -23,6 +23,7 @@ function setEditorValue(editor, value) {
 }
 
 export function swap() {
+  ignoreChange = true;
   const { originalEditor, modifiedEditor } = diffEditor;
   const leftValue = originalEditor.getValue();
   const rightValue = modifiedEditor.getValue();
@@ -39,6 +40,10 @@ function generateMonacoFakeUri(path, qs) {
 }
 
 function onDidUpdateDiff() {
+  if (ignoreChange) {
+    ignoreChange = !ignoreChange;
+    return;
+  }
   vscode.postMessage({
     command: 'change'
   });
