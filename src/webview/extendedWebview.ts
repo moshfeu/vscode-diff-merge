@@ -64,7 +64,7 @@ export class ExtendedWebview {
       this.params.leftPath = this.params.rightPath;
       this.params.rightPath = leftPath as string;
 
-      this.setPanelTitle();
+      this.setPanelTitle(true);
       this.api.sendSwap();
     }
   }
@@ -87,12 +87,16 @@ export class ExtendedWebview {
     }
   }
 
-  private setPanelTitle() {
+  private setPanelTitle(keepDraft?: boolean) {
     const getInitialTitle = () => {
       if ('rightContent' in this.params) {
         const { mode } = this;
         const { leftPath, rightPath, leftContent } = this.params;
-        return getTitle(rightPath, mode || 'file', leftPath, !!leftContent);
+        let title = getTitle(rightPath, mode || 'file', leftPath, !!leftContent);
+        if (keepDraft && this.webViewPanel.title.includes(UNSAVED_SYMBOL)) {
+          title += UNSAVED_SYMBOL;
+        }
+        return title;
       }
       return 'File is not supported';
     };

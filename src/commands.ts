@@ -33,7 +33,7 @@ export function init(context: ExtensionContext) {
 
   async function fileDiff(e: Uri, list?: Uri[]) {
     let leftPath, currentPath;
-    if (list) {
+    if (list && list.length > 1) {
       ([leftPath, currentPath] = list.map(p => p.fsPath));
     } else {
       const file = await window.showOpenDialog({});
