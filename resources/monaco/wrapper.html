@@ -25,6 +25,7 @@
     <option value="3">Replace multiline</option>
     <option value="4">Multiplace actions</option>
   </select>
+  <button onclick="swap()">Swap</button>
   <iframe scrolling="no" id="wrapper" src="index.html"></iframe>
   <script>
     const qs = new URLSearchParams(location.search);
@@ -117,6 +118,12 @@ New content 🤪
           fileNotSupported
         }
       })
+    }
+
+    function swap() {
+      iframe.contentWindow.postMessage({
+        key: 'swap'
+      });
     }
   </script>
 </body>

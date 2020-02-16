@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -x
 cd resources/monaco/
 echo "<<yarn>>"
 yarn

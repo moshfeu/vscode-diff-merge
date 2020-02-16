@@ -2,7 +2,7 @@
   "name": "diff-merge",
   "displayName": "Diff & Merge",
   "description": "Show diffs and merge",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/moshfeu/vscode-diff-merge"
@@ -66,7 +66,11 @@
       "explorer/context": [
         {
           "command": "diffMerge.chooseFile",
-          "when": "!explorerResourceIsFolder"
+          "when": "!explorerResourceIsFolder && !listMultiSelection"
+        },
+        {
+          "command": "diffMerge.compareSelected",
+          "when": "listDoubleSelection"
         }
       ],
       "scm/resourceState/context": [
@@ -75,6 +79,11 @@
         }
       ],
       "editor/title": [
+        {
+          "command": "diffMerge.swap",
+          "group": "navigation@-101",
+          "when": "diffMerge.panelFocused"
+        },
         {
           "command": "diffMerge.nextDiff",
           "group": "navigation@-100",
@@ -137,8 +146,21 @@
         }
       },
       {
+        "title": "Swap sides",
+        "category": "Diff Merge",
+        "command": "diffMerge.swap",
+        "icon": {
+          "dark": "resources/icons/dark/swap.svg",
+          "light": "resources/icons/light/swap.svg"
+        }
+      },
+      {
         "title": "[Diff & Merge] Choose a file to merge",
         "command": "diffMerge.chooseFile"
+      },
+      {
+        "title": "[Diff & Merge] Compare Selected",
+        "command": "diffMerge.compareSelected"
       },
       {
         "title": "[Diff & Merge] Blank diff view",

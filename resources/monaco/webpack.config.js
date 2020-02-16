@@ -11,6 +11,7 @@ module.exports = {
     "html.worker": 'monaco-editor/esm/vs/language/html/html.worker',
     "ts.worker": 'monaco-editor/esm/vs/language/typescript/ts.worker',
   },
+  mode: 'production',
   output: {
     globalObject: 'self',
     filename: '[name].bundle.js',
