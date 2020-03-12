@@ -6,7 +6,10 @@ import * as monaco from 'monaco-editor';
 import {render, addDiffActions, swap} from './utils';
 
 const diffEditor = monaco.editor.createDiffEditor(
-  document.getElementById('container')
+  document.getElementById('container'),
+  {
+    originalEditable: true
+  }
 );
 
 self.addEventListener('resize', () => {

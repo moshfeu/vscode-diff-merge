@@ -1,8 +1,9 @@
 let cacheActionsLines = [];
 let diffActionsNode, diffEditor, ignoreChange = false;
 
-export function render(_diffEditor, { rightPath, notSupportedFile, leftContent, rightContent, theme }) {
+export function render(_diffEditor, { rightPath, notSupportedFile, leftContent, rightContent, theme, tabSize }) {
   diffEditor = _diffEditor;
+  window.diffEditor = _diffEditor;
   diffEditor.setModel({
     original: monaco.editor.createModel(leftContent, null, generateMonacoFakeUri(rightPath, 'org')),
     modified: monaco.editor.createModel(rightContent, null, generateMonacoFakeUri(rightPath, 'mod'))
@@ -13,9 +14,14 @@ export function render(_diffEditor, { rightPath, notSupportedFile, leftContent, 
   bindSaveShortcut();
   extractEditorStyles(diffEditor);
   setTheme(theme);
-  diffEditor.originalEditor.updateOptions({
-    readOnly: false
-  });
+  setTabSize(tabSize);
+}
+
+function setTabSize(tabSize) {
+    const { originalEditor, modifiedEditor } = diffEditor;
+    const updateTabSize = model => model.updateOptions({ tabSize, detectIndentation: false });
+    updateTabSize(originalEditor.getModel());
+    updateTabSize(modifiedEditor.getModel());
 }
 
 function setEditorValue(editor, value) {
@@ -198,7 +204,8 @@ function bindSaveShortcut() {
 }
 
 function extractEditorStyles(diffEditor) {
-  document.body.style.setProperty('--diff-merge-lineheight', `${diffEditor.modifiedEditor.getConfiguration().lineHeight}px`);
+  const lineHeight = diffEditor.modifiedEditor.getOption(monaco.editor.EditorOption.lineHeight);
+  document.body.style.setProperty('--diff-merge-lineheight', `${lineHeight}px`);
 }
 
 function setTheme(theme) {

@@ -5,7 +5,7 @@ import { getSafeFsPath } from '../path';
 import { setActiveDiffPanelWebview } from './store';
 import { ExtendedWebview, ExtendedWebviewEnv, IExtendedWebviewEnvDiff } from './extendedWebview';
 import { utf8Stream, fileNotSupported } from '../constants';
-import { window, ViewColumn, ExtensionContext } from 'vscode';
+import { window, ViewColumn, ExtensionContext, workspace } from 'vscode';
 import { extract } from '../theme/extractor';
 import { getTitle } from './utils';
 
@@ -34,6 +34,7 @@ export async function showDiff({ leftContent, rightContent, leftPath, rightPath,
     );
 
     const theme = await extract();
+    const { tabSize } = workspace.getConfiguration('editor');
 
     const webviewEnv: ExtendedWebviewEnv = {
       leftPath,
@@ -41,7 +42,8 @@ export async function showDiff({ leftContent, rightContent, leftPath, rightPath,
       leftContent,
       rightContent,
       fileNotSupported,
-      theme
+      theme,
+      tabSize
     };
 
     const extendsWebView = new ExtendedWebview(

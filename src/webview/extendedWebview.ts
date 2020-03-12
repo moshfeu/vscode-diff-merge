@@ -17,6 +17,7 @@ export interface IExtendedWebviewEnvDiff {
   rightContent: string;
   fileNotSupported: string;
   theme: any;
+  tabSize: number;
 }
 
 export type ExtendedWebviewEnv = IExtendedWebviewEnvContentOnly | IExtendedWebviewEnvDiff;
