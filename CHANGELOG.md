@@ -2,6 +2,10 @@
 
 All notable changes to the "compare-folders" extension will be documented in this file.
 
+## 0.2.0
+
+- Honot editor.tabSize - #1
+
 ## 0.1.1
 
 - Swap sides - #1

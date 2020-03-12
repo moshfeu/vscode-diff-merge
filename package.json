@@ -2,7 +2,7 @@
   "name": "diff-merge",
   "displayName": "Diff & Merge",
   "description": "Show diffs and merge",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/moshfeu/vscode-diff-merge"
@@ -55,7 +55,7 @@
     "mocha": "^6.1.4",
     "tslint": "^5.12.1",
     "typescript": "^3.3.1",
-    "vsce": "^1.69.0",
+    "vsce": "^1.74.0",
     "vscode-test": "^1.0.2"
   },
   "dependencies": {
