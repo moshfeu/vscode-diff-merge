@@ -1,3 +1,10 @@
+[![Build Status](https://dev.azure.com/moshfeu-vscode/DiffMergeExtension/_apis/build/status/moshfeu.vscode-diff-merge?branchName=master)](https://dev.azure.com/moshfeu-vscode/DiffMergeExtension/_build/latest?definitionId=1&branchName=master)
+[![contributions welcome](https://img.shields.io/badge/contributions-welcome-yellow.svg?style=flat)](https://github.com/Coding-Coach/find-a-mentor/issues)
+[![The MIT License](https://flat.badgen.net/badge/license/MIT/orange)](http://opensource.org/licenses/MIT)
+[![GitHub](https://flat.badgen.net/github/release/moshfeu/vscode-diff-merge)](https://github.com/moshfeu/vscode-diff-merge/releases)
+[![Visual Studio Marketplace](https://vsmarketplacebadge.apphb.com/installs-short/moshfeu.diff-merge.svg?style=flat-square)](https://marketplace.visualstudio.com/items?itemName=moshfeu.diff-merge)
+[![Follow me on Twitter](https://img.shields.io/twitter/follow/moshfeu.svg?style=social)](https://twitter.com/moshfeu)
+
 # Diff & Merge - Alpha version!
 
 Show diffs and allow to merge from left side to right side.
