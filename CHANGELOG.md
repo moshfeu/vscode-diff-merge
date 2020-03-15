@@ -4,7 +4,7 @@ All notable changes to the "compare-folders" extension will be documented in thi
 
 ## 0.2.0
 
-- Honot editor.tabSize - #1
+- Honor `editor.tabSize` - #4
 
 ## 0.1.1
 
