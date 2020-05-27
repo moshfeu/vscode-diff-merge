@@ -74,10 +74,13 @@ export class ExtendedWebview {
     if (this.templateName === 'diff') {
       const path = join(this.context.extensionPath, 'resources', 'monaco', 'index.html');
       const file = readFileSync(path, utf8Stream);
-      const webviewBaseHref = Uri.file(join(this.context.extensionPath, 'resources', 'monaco'))
-                                 .with({ scheme: 'vscode-resource' });
+      const webviewBaseHref = this.webViewPanel.webview.asWebviewUri(
+        Uri.file(join(this.context.extensionPath, 'resources', 'monaco'))
+      );
 
-      return file.replace('###base###', `${webviewBaseHref}/`);
+      return file
+        .replace('###base###', `${webviewBaseHref}/`)
+        .replace(/###cspSource###/g, this.webViewPanel.webview.cspSource);
     }
     return readFileSync(join(this.context.extensionPath, 'resources', `${this.templateName}.html`), utf8Stream);
   }
