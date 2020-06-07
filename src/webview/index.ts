@@ -72,12 +72,14 @@ export async function showDiff({ leftContent, rightContent, leftPath, rightPath,
     extendsWebView.render();
     panel.onDidChangeViewState(e => {
       setPanelFocused(e.webviewPanel.active);
+      log(`panel visibility changed to: ${e.webviewPanel.active}`);
       // don't need to worry when it's not active becuase the diff navigator's buttons will be invisible
       if (e.webviewPanel.active) {
         setActiveDiffPanelWebview(extendsWebView);
       }
     });
     panel.onDidDispose(() => {
+      log('panel disposed');
       setPanelFocused(false);
     });
     // ugly, I know. The case is when opening new diff view, with the timeout, the new panel will wait fot the previous panel to set focus out
