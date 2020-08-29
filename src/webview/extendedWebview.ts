@@ -79,7 +79,7 @@ export class ExtendedWebview {
       );
 
       return file
-        .replace('###base###', `${webviewBaseHref}/`)
+        .replace(/###base###/g, `${webviewBaseHref}/`)
         .replace(/###cspSource###/g, this.webViewPanel.webview.cspSource);
     }
     return readFileSync(join(this.context.extensionPath, 'resources', `${this.templateName}.html`), utf8Stream);
