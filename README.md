@@ -30,7 +30,6 @@ Found a bug? Have an extra ordinary idea? Please create an [issue](https://githu
 1. Right click on a file <sup>[1]</sup> in _explorer_ panel
 1. Click on `[Diff & Merge] Choose a file to merge`
 1. Choose a file <sup>[1]</sup> to compare
-<hr />
 
 ### 2. Diff and merge - git - file against older version
 
@@ -41,17 +40,23 @@ Found a bug? Have an extra ordinary idea? Please create an [issue](https://githu
 1. Right click on a file <sup>[1]</sup> in the source control panel under **Changes** (staged files are not editable anyway)
 1. Click on `[Diff & Merge] Open Changes`
 
-<hr >
-<sup>[1]</sup> - Make sure that the file is text based (not images, binaries, pdfs etc.)
+### 3. Diff and merge - svn - changes (tested with the [svg extension](https://marketplace.visualstudio.com/items?itemName=johnstoncode.svn-scm))
 
+<img width="300" alt="source control - svn" src="https://user-images.githubusercontent.com/3723951/93455884-9ccb7480-f8e5-11ea-8a43-e8c924c4e4cd.png">
 
-### 3. Diff and merge - from scratch
+1. Right click on a file <sup>[1]</sup> in the source control panel under **Changes** (staged files are not editable anyway)
+1. Click on `[Diff & Merge] Open Changes`
+
+### 4. Diff and merge - from scratch
 
 **How to use?**
 
 1. Open commmand palette (<kbd>Command / Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd>)
 1. Search for `[Diff & Merge] Blank diff view`
 1. An empty diff view will opened. Paste a code in both of sides and compare
+
+<hr />
+<sup>[1]</sup> - Make sure that the file is text based (not images, binaries, pdfs etc.)
 
 ## To Do
 

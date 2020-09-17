@@ -17,11 +17,11 @@ export function init(context: ExtensionContext) {
     showDiff({ leftContent: '', rightContent: '', rightPath: '', context });
   }
 
-  function gitDiff(e: {original: Uri}) {
+  function gitDiff(e: { resourceUri: Uri }) {
     try {
-      const rightPath = getFilePath(e.original.fsPath);
+      const rightPath = getFilePath(e.resourceUri.fsPath);
       const { leftContent, rightContent } = getGitSides(rightPath);
-      if (rightContent) {
+      if (rightContent || leftContent) {
         showDiff({ leftContent, rightContent, rightPath, context });
       } else {
         showNotSupported(context, rightPath, 'git');
@@ -34,7 +34,7 @@ export function init(context: ExtensionContext) {
   async function fileDiff(e: Uri, list?: Uri[]) {
     let leftPath, currentPath;
     if (list && list.length > 1) {
-      ([leftPath, currentPath] = list.map(p => p.fsPath));
+      [leftPath, currentPath] = list.map((p) => p.fsPath);
     } else {
       const file = await window.showOpenDialog({});
       if (file) {
@@ -46,7 +46,10 @@ export function init(context: ExtensionContext) {
     if (leftPath && currentPath) {
       const rightPath = currentPath ? Uri.parse(currentPath).path : '';
 
-      const { leftContent, rightContent } = getExplorerSides(leftPath, rightPath);
+      const { leftContent, rightContent } = getExplorerSides(
+        leftPath,
+        rightPath
+      );
       showDiff({ leftContent, rightContent, leftPath, rightPath, context });
     }
   }
