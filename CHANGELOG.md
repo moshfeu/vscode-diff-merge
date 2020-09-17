@@ -4,7 +4,7 @@ All notable changes to the "compare-folders" extension will be documented in thi
 
 ## 0.3.0
 
-- feat: Support svg as source control with [svg extension](https://marketplace.visualstudio.com/items?itemName=johnstoncode.svn-scm) - #21
+- feat: Support svn as source control with [svn extension](https://marketplace.visualstudio.com/items?itemName=johnstoncode.svn-scm) - #21
 - fix: files content been cut after 1k lines. increased to 100k - #14
 
 ## 0.2.0
