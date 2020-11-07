@@ -25,13 +25,18 @@ Found a bug? Have an extra ordinary idea? Please create an [issue](https://githu
 
 <img width="463" alt="explorer - context" src="https://user-images.githubusercontent.com/3723951/69405996-b4f45680-0d09-11ea-9b9f-f24f9e9c69a5.png">
 
+
+### 2. Diff and merge - file against clipboard (#25)
+
+<img width="463" src="https://user-images.githubusercontent.com/3723951/98452048-7cd16800-2154-11eb-9a3c-cdc8fe73aa90.gif" />
+
 **How to use?**
 
 1. Right click on a file <sup>[1]</sup> in _explorer_ panel
 1. Click on `[Diff & Merge] Choose a file to merge`
 1. Choose a file <sup>[1]</sup> to compare
 
-### 2. Diff and merge - git - file against older version
+### 3. Diff and merge - git - file against older version
 
 <img width="340" alt="source control - context" src="https://user-images.githubusercontent.com/3723951/69405995-b4f45680-0d09-11ea-837c-4a8925df3556.png">
 
@@ -40,7 +45,7 @@ Found a bug? Have an extra ordinary idea? Please create an [issue](https://githu
 1. Right click on a file <sup>[1]</sup> in the source control panel under **Changes** (staged files are not editable anyway)
 1. Click on `[Diff & Merge] Open Changes`
 
-### 3. Diff and merge - svn - changes (tested with the [svg extension](https://marketplace.visualstudio.com/items?itemName=johnstoncode.svn-scm))
+### 4. Diff and merge - svn - changes (tested with the [svg extension](https://marketplace.visualstudio.com/items?itemName=johnstoncode.svn-scm))
 
 <img width="300" alt="source control - svn" src="https://user-images.githubusercontent.com/3723951/93455884-9ccb7480-f8e5-11ea-8a43-e8c924c4e4cd.png">
 
