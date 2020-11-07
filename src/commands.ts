@@ -2,7 +2,8 @@ import { getFilePath } from './path';
 import { showDiff, showNotSupported } from './webview';
 import { getGitSides, getExplorerSides } from './content';
 import { getActiveDiffPanelWebview } from './webview/store';
-import { commands, window, Uri, ExtensionContext } from 'vscode';
+import { commands, window, Uri, ExtensionContext, env } from 'vscode';
+import { log } from './logger';
 
 export function init(context: ExtensionContext) {
   commands.registerCommand('diffMerge.scm.file', gitDiff);
@@ -12,6 +13,28 @@ export function init(context: ExtensionContext) {
   commands.registerCommand('diffMerge.prevDiff', prevDiff);
   commands.registerCommand('diffMerge.compareSelected', fileDiff);
   commands.registerCommand('diffMerge.swap', swap);
+  commands.registerCommand(
+    'diffMerge.compareFileWithClipboard',
+    compareFileWithClipboard
+  );
+
+  async function compareFileWithClipboard() {
+    const { document } = window.activeTextEditor || {};
+    if (!document) {
+      window.showInformationMessage(
+        'This command has to be run only when a text based file is open'
+      );
+      log('This command has to be run only when a file is open');
+      return;
+    }
+    showDiff({
+      context,
+      leftContent: await env.clipboard.readText(),
+      leftPath: 'Clipboard',
+      rightPath: document.uri.fsPath,
+      rightContent: document.getText(),
+    });
+  }
 
   function blank() {
     showDiff({ leftContent: '', rightContent: '', rightPath: '', context });
