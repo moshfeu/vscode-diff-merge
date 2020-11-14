@@ -2,7 +2,7 @@
   "name": "diff-merge",
   "displayName": "Diff & Merge",
   "description": "Show diffs and merge",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/moshfeu/vscode-diff-merge"
@@ -95,6 +95,11 @@
           "when": "diffMerge.panelFocused"
         }
       ],
+      "editor/title/context": [
+        {
+          "command": "diffMerge.compareFileWithClipboard"
+        }
+      ],
       "commandPalette": [
         {
           "command": "diffMerge.chooseFile",
@@ -169,6 +174,10 @@
       {
         "title": "[Diff & Merge] Open Changes",
         "command": "diffMerge.scm.file"
+      },
+      {
+        "title": "[Diff & Merge] Compare file with Clipboard",
+        "command": "diffMerge.compareFileWithClipboard"
       }
     ]
   }
