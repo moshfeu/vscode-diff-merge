@@ -1,47 +1,50 @@
-import { appendFileSync, writeFileSync } from 'fs';
-import path from 'path';
-
 const pathDescription: RegExp = /((.|\n|\r)*)@@\n/g;
-const pathNewline: RegExp = /\\ No newline at end of file[\n]*/gm;
-const lastEmptyLine: RegExp = /^\s*\z$/gm;
-const eol = /\n$/;
-const addedLine: RegExp = /^\+.*[\r\n]*/gm;
-const removedLine: RegExp = /^\-.*[\r\n]*/gm;
-const addedLineDiffSynmbol: RegExp = /^\+/gm;
-const removeLineDiffSynmbol: RegExp = /^-/gm;
-const diffIndentation: RegExp = /^ /gm;
-const noNewLine = '(\n\\\\ No newline at end of file)';
-const noNewLineLeft = new RegExp(`${noNewLine}\n`);
-const noNewLineRight = new RegExp(`${noNewLine}$`);
+const eof = /\n$/;
+
+type Line = {
+  added: boolean;
+  removed: boolean;
+  eof: boolean;
+  code: string;
+};
+
+type LineType = keyof Pick<Line, 'added' | 'removed'>;
+type Side = 'left' | 'right';
+
+const eofR = /\\ No newline at end of file/;
 
 export function patchToCodes(patch: string) {
-  const onlyCode = patch.replace(pathDescription, '').replace(eol, '');
-  const p = path.join(__dirname, 'log.txt');
-  writeFileSync(p, '', { encoding: 'utf8' });
+  const onlyCode = patch.replace(pathDescription, '').replace(eof, '');
+  const patchHasEof = !patch.match(eofR);
 
-  const l = (str: string) => {
-    appendFileSync(p, '\n------\n' + str, { encoding: 'utf8' });
-    return str;
+  const lines = onlyCode.split('\n').map((line) => ({
+    added: line.startsWith('+'),
+    removed: line.startsWith('-'),
+    code: line.substr(1, line.length),
+    eof: !!line.match(eofR),
+  }));
+
+  const extractSide = (side: Side) => {
+    const lineTypeToRemove: LineType = side === 'left' ? 'added' : 'removed';
+    const sideHasEof = !!lines[lines.findIndex((l) => l.eof) - 1]?.[
+      lineTypeToRemove
+    ];
+
+    const sideLines = lines.reduce<string[]>((acc, curr, idx) => {
+      if (curr[lineTypeToRemove] || curr.eof) {
+        return acc;
+      }
+      return [...acc, curr.code];
+    }, []);
+    if (patchHasEof || sideHasEof) {
+      sideLines.push('');
+    }
+
+    return sideLines.join('\n');
   };
 
-  let leftContent = onlyCode
-    .replace(addedLine, '')
-    .replace(removeLineDiffSynmbol, ' ')
-    .replace(diffIndentation, '')
-    .replace(noNewLineRight, '\n')
-    .replace(noNewLineLeft, '');
-
-  let rightContent = onlyCode
-    .replace(removedLine, '')
-    .replace(addedLineDiffSynmbol, ' ')
-    .replace(diffIndentation, '')
-    .replace(noNewLineRight, '')
-    .replace(noNewLineLeft, '\n');
-
-  if (!onlyCode.match(new RegExp(noNewLine))) {
-    rightContent += '\n';
-    leftContent += '\n';
-  }
+  const leftContent = extractSide('left');
+  const rightContent = extractSide('right');
 
   return {
     leftContent,

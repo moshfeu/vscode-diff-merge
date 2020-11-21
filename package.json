@@ -40,6 +40,7 @@
     "webview:watch": "cd resources/monaco && yarn build:dev",
     "watch": "tsc -watch -p ./",
     "pretest": "yarn run compile",
+    "test:unit": "ts-mocha src/**/*.spec.ts",
     "test": "node ./out/test/runTest.js",
     "package": "bash scripts/package.sh",
     "deploy": "yarn package && vsce publish -p"
@@ -53,6 +54,7 @@
     "@types/vscode": "^1.38.0",
     "glob": "^7.1.4",
     "mocha": "^6.1.4",
+    "ts-mocha": "^8.0.0",
     "tslint": "^5.12.1",
     "typescript": "^3.3.1",
     "vsce": "^1.74.0",
