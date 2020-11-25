@@ -5,10 +5,11 @@ import * as istextorbinary from 'istextorbinary';
 import { utf8Stream, fileNotSupported, cwdCommandOptions } from './constants';
 import { log } from './logger';
 import { isGit, isSvn } from './vc';
+import { patchToCodes } from './patch';
 
 const pathDescription: RegExp = /((.|\n|\r)*)@@\n/g;
 const pathNewline: RegExp = /\\ No newline at end of file[\n]*/gm;
-const lastEmptyLine: RegExp = /\n+$/gm;
+const lastEmptyLine: RegExp = /^\s*\z$/gm;
 const addedLine: RegExp = /^\+.*[\r\n]*/gm;
 const removedLine: RegExp = /^\-.*[\r\n]*/gm;
 const addedLineDiffSynmbol: RegExp = /^\+/gm;
@@ -52,22 +53,7 @@ export function getGitSides(path: string) {
     }
 
     if (patch) {
-      const onlyCode = patch
-        .replace(pathDescription, '')
-        .replace(pathNewline, '')
-        .replace(lastEmptyLine, '');
-
-      leftContent = onlyCode
-        .replace(addedLine, '')
-        .replace(removeLineDiffSynmbol, ' ')
-        .replace(diffIndentation, '')
-        .replace(lastEmptyLine, '');
-
-      rightContent = onlyCode
-        .replace(removedLine, '')
-        .replace(addedLineDiffSynmbol, ' ')
-        .replace(diffIndentation, '')
-        .replace(lastEmptyLine, '');
+      ({ leftContent, rightContent } = patchToCodes(patch));
     } else {
       // no diff
       rightContent = getContentOrFallback(`${rootPath}/${path}`);
