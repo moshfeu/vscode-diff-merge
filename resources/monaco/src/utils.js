@@ -176,19 +176,23 @@ function createOrUpdateDiffAction(diffActionsNode, top, onCopy) {
   }
 }
 
-function createDiffActionsContainer(diffEditor) {
+export function layoutDiffContainer(diffActions = diffActionsNode) {
   const modifedEditorNode = diffEditor.modifiedEditor.getDomNode();
-  const diffActions = document.createElement('div');
-  diffActions.className = 'diffActions diffOverview';
-  diffActions.style.height = `${diffEditor.originalEditor.getScrollHeight()}px`;
   diffActions.style.left = `${
     modifedEditorNode.getBoundingClientRect().left
   }px`;
+}
+
+function createDiffActionsContainer(diffEditor) {
+  const diffActions = document.createElement('div');
+  diffActions.className = 'diffActions diffOverview';
+  diffActions.style.height = `${diffEditor.originalEditor.getScrollHeight()}px`;
   document.querySelector('#container').appendChild(diffActions);
 
   diffEditor.modifiedEditor.onDidScrollChange(({ scrollTop }) => {
     diffActions.style.top = `-${scrollTop}px`;
   });
+  layoutDiffContainer(diffActions);
   return diffActions;
 }
 
