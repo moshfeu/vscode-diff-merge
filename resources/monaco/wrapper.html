@@ -31,6 +31,1128 @@
     const qs = new URLSearchParams(location.search);
     const diffs = [
       {
+        rightContent: `<?php
+
+class Image
+{
+    /**
+     * Maakt een thumbnail afbeelding van de originele afbeelding in $src
+     * Zal kaders toevoegen als de nieuwe verhoudingen van de afbeelding niet overeenkomen
+     * met de verhoudingen van de originele afbeelding
+     * @param srting $src               Bron locatie van het origineel
+     * @param int $wmax                 Breedte van de thumbnail mits deze kleiner is dan het origineel
+     * @param int $hmax                 Hoogte van de thumbnail mits deze kleiner is dan het origineel
+     * @param type $bgcol               Achtergrond kleur van de kaders
+     * @param type $seonaam
+     * @param type $position            Locatie van de afbeelding ten opzichte van de tumbnail
+     *                                  (de rest wordt met $bgcol opgevuld) ("boven", "onder" of "center")"
+     * @param string $watermark         Bron locatie van de watermark
+     * @param string $watermark_pos_h   Horizontale locatie van het watermerk ("boven" of "onder")
+     * @param string $watermark_pos_v   Verticale locatie van het watermerk ("links", "rechts"of "center")
+     * @param string $text              Toe te voegen text aan de afbeelding
+     * @param string $text_font         Font van de text (momenteel alleen Arial)
+     * @param string $text_pos_h        Horizontale locatie van de text ("boven" of "onder")
+     * @param string $text_pos_v        Verticale locatie van text ("links", "rechts"of "center")
+     * @return string           Locatie van de thumbnail
+     */
+    public static function GetImage($src, $wmax = "", $hmax = "", $bgcol = "", $seonaam = "image",$position="center" , $watermark = "", $watermark_pos_h = "boven", $watermark_pos_v = "center", $text = "", $text_font = "arial", $text_pos_h = "boven", $text_pos_v = "center")
+    {
+
+        if(ISFACTIF) {
+            if ($_SERVER['HTTP_HOST'] == 'restyle2020.sans-online.nl') {
+                if (stristr($src, 'pimages')) {
+                    $fileArr = pathinfo($src);
+
+                    if (isset($fileArr['extension']) && $fileArr['extension'] == 'jpg') {
+                        if (!is_file($_SERVER['DOCUMENT_ROOT'] . '/pimages/' . $fileArr['basename'])) {
+                            $onlineFile = 'https://www.sans-online.nl/pimages/' . $fileArr['basename'];
+                            $imageInfo = file_get_contents($onlineFile);
+                            if (!empty($imageInfo)) {
+                                file_put_contents($_SERVER['DOCUMENT_ROOT'] . '/pimages/' . $fileArr['basename'], $imageInfo);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if(CFG_PIMAGES_REMOTE && preg_match("/pimages\//i", $src))
+        {
+            return self::_RemoteImage($src, $wmax, $hmax, $seonaam);
+        }
+
+        $src = self::CheckImage($src);
+
+        $src = str_replace("//", "/", $src);
+        $src_noext = substr($src, 0, strrpos($src, "."));
+        $src_ext = substr($src, strrpos($src, ".") + 1, 6);
+        $size = getimagesize(CFG_DOCUMENTROOT . $src);
+        $orig_w = $size[0];
+        $orig_h = $size[1];
+
+        // Nieuw stukje code: als breedte OF hoogte 0 is dan de juiste proportie berekenen.
+        if (($wmax == 0 || $wmax == "") || ($hmax == 0 || $hmax == ""))
+        {
+            if (($wmax == 0 || $wmax == "") && ($hmax != 0 || $hmax != ""))
+            {
+                $wmax = round(($orig_w / 100) * ($hmax / ($orig_h / 100)));
+            }
+            else if (($hmax == 0 || $hmax == "") && ($wmax != 0 || $wmax != ""))
+            {
+                $hmax = round(($orig_h / 100) * ($wmax / ($orig_w / 100)));
+            }
+        }
+
+        if ($orig_w > $wmax && $orig_h > $hmax)
+        {
+            $thumb_w = $wmax;
+            $thumb_h = $hmax;
+            if ($thumb_w / $orig_w * $orig_h > $thumb_h)
+                $thumb_w = round($thumb_h * $orig_w / $orig_h);
+            else
+                $thumb_h = round($thumb_w * $orig_h / $orig_w);
+        }
+        else if ($orig_w > $wmax)
+        {
+            $thumb_w = $wmax;
+            $thumb_h = $orig_h;
+            if ($thumb_w / $orig_w * $orig_h > $thumb_h)
+                $thumb_w = round($thumb_h * $orig_w / $orig_h);
+            else
+                $thumb_h = round($thumb_w * $orig_h / $orig_w);
+        }
+        else if ($orig_h > $hmax)
+        {
+            $thumb_w = $orig_w;
+            $thumb_h = $hmax;
+            if ($thumb_w / $orig_w * $orig_h > $thumb_h)
+                $thumb_w = round($thumb_h * $orig_w / $orig_h);
+            else
+                $thumb_h = round($thumb_w * $orig_h / $orig_w);
+        }
+        else
+        {
+            $thumb_w = $orig_w;
+            $thumb_h = $orig_h;
+        }
+
+        //nieuwe bestandsnaam
+        $resizedfilename = $src_noext . "-" . $wmax . "-" . $hmax . "." . $src_ext;
+
+        if (file_exists(CFG_DOCUMENTROOT . $resizedfilename))
+        {
+            return $resizedfilename;
+        }
+        else
+        {
+            //Get Image size info
+            $img = CFG_DOCUMENTROOT . $src;
+            $imgInfo = getimagesize($img);
+            //bescherming tegen te grote plaatjes > 5Mb
+            if (filesize($img) > 5242880)
+            {
+                return "/" . CFG_PRODUCTIMGDIR . 'niks.jpg';
+            };
+            switch ($imgInfo[2])
+            {
+                case 1: $source = imagecreatefromgif($img);
+                    break;
+                case 2: $source = imagecreatefromjpeg($img);
+                    break;
+                case 6: $source = imagecreatefromjpeg($img);
+                    break;
+                case 3: $source = imagecreatefrompng($img);
+                    break;
+                default:
+                 //   trigger_error('Unsupported filetype! ', E_USER_WARNING);
+                    return;
+                    break;
+            }
+            /* Check if this image is PNG or GIF, then set if Transparent */
+            if (($imgInfo[2] == 1) || ( $imgInfo[2] == 3))
+            {
+                if (!empty($source) && !empty($thumb)){
+                    imagealphablending($source, true);
+                    imagesavealpha($source, true);
+                    $white = imagecolorallocate($thumb, 255, 255, 255);
+                    $transparent = imagecolorallocatealpha($thumb, 255, 255, 255, 127);
+                    imagefilledrectangle($thumb, 0, 0, $wmax - 1, $hmax - 1, $transparent);
+                    imagecolortransparent($thumb, $white);
+                }
+
+            }
+
+            if ($bgcol)
+            {
+                $thumb = imagecreatetruecolor($wmax, $hmax);
+                imagefilledrectangle($thumb, 0, 0, $wmax - 1, $hmax - 1, intval($bgcol, 16));
+            }else{
+                $thumb = imagecreatetruecolor($thumb_w, $thumb_h);
+                $position="top";
+            }
+            if($position=="top")
+            {
+                $image_top = 0;
+            }
+            elseif($position=="bottom")
+            {
+                $image_top = round($hmax - $thumb_h);
+            }
+            else
+            {
+                $image_top = round(($hmax - $thumb_h) / 2);
+            }
+            imagecopyresampled($thumb, $source, round(($wmax - $thumb_w) / 2), $image_top, 0, 0, $thumb_w, $thumb_h, $orig_w, $orig_h);
+
+            // $watermark toevoegen
+            if (!empty($watermark)) {
+                $watermark = self::CheckImage($watermark);
+                $water_size = getimagesize(CFG_DOCUMENTROOT . $watermark);
+                $water_orig_w = $water_size[0];
+                $water_orig_h = $water_size[1];
+                $watermax_h = round($wmax / 4);
+                $watermax_w = round(($wmax / 3) * 2);
+                $water_final_height = -1;
+
+                if ($water_orig_h > $watermax_h ){
+                    $water_final_height = $watermax_h;
+                    $water_final_width = round(($water_final_height * $water_orig_w) /$water_orig_h );
+                } else if ($water_orig_w > $watermax_w || $water_final_width > $watermax_w) {
+                    $water_final_width = $watermax_w;
+                    $water_final_height = round(($water_final_width * $water_orig_h) /$water_orig_w );
+                } else {
+                    $water_final_height = $water_orig_h;
+                    $water_final_width = $water_orig_w;
+                }
+
+
+                //Get Image size info
+                $water_img = CFG_DOCUMENTROOT . $watermark;
+                $water_imgInfo = getimagesize($water_img);
+                //bescherming tegen te grote plaatjes > 5Mb
+                if (filesize($water_img) > 5242880)
+                {
+                    return;
+                };
+                switch ($water_imgInfo[2])
+                {
+                    case 1: $water_source = imagecreatefromgif($water_img);
+                        break;
+                    case 2: $water_source = imagecreatefromjpeg($water_img);
+                        break;
+                    case 6: $water_source = imagecreatefromjpeg($water_img);
+                        break;
+                    case 3: $water_source = imagecreatefrompng($water_img);
+                        break;
+                    default:
+                     //   trigger_error('Unsupported filetype! ', E_USER_WARNING);
+                        return;
+                        break;
+                }
+                if ($watermark_pos_h == "boven") {
+                    $water_final_y = 0;
+                } else if ($watermark_pos_h = "onder") {
+                    $water_final_y = round($hmax - $water_final_height);
+                }
+
+                if ($watermark_pos_v == "links") {
+                    $water_final_x = 0;
+                } else if ($watermark_pos_v == "rechts") {
+                    $water_final_x = $wmax - $water_final_width;
+                } else if ($watermark_pos_v == "center") {
+                    $water_final_x = round(($wmax / 2) - ($water_final_width / 2));
+                }
+
+                imagecopyresampled($thumb, $water_source, $water_final_x, $water_final_y, 0, 0, $water_final_width, $water_final_height, $water_orig_w, $water_orig_h);
+
+
+            }
+
+            if (!empty($text)) {
+
+                if ($text_font == "arial") {
+                    $font = CFG_DOCUMENTROOT."admin/includes/barcode/arialbd.ttf";
+
+                }
+                $font_size = round($wmax / 8);
+
+                $type_space = imagettfbbox($font_size, 0, $font, $text);
+
+                $text_width = abs($type_space[4] - $type_space[0]) + round( $wmax / 50);
+                $text_height = abs($type_space[5] - $type_space[1]) + round( $wmax / 50);
+
+
+                if ($text_pos_h == "boven") {
+                    $text_final_y = $text_height;
+                } else if ($text_pos_h == "onder"){
+                    $text_final_y = round($wmax - ($wmax / 32));
+                }
+
+                if ($text_pos_v == "links") {
+                    $text_final_x = round( $wmax / 50);
+                } else if ($text_pos_v == "rechts") {
+                    $text_final_x =  $wmax - $text_width;
+                } else if ($text_pos_v == "center") {
+                    $text_final_x = round(($wmax / 2) - ($text_width / 2));
+                }
+                imagettftext($thumb, $font_size, 0, $text_final_x, $text_final_y, "000000", $font, $text );
+            }
+
+        $dstHeight=$thumb_h;
+        $dstY=round(($hmax - $thumb_h) / 2);
+        $dstWidth=$thumb_w;
+         $dstX=round(($wmax - $thumb_w) / 2);
+
+
+       //bg distortion fix
+    $colorWhite = imagecolorallocate($thumb,255,255,255);
+    $processHeight = $dstHeight+$dstY;
+    $processWidth = $dstWidth+$dstX;
+    //Travel y axis
+    for($y=$dstY; $y<($processHeight); ++$y){
+        // Travel x axis
+        for($x=$dstX; $x<($processWidth); ++$x){
+            // Change pixel color
+            $colorat=imagecolorat($thumb, $x, $y);
+            $r = ($colorat >> 16) & 0xFF;
+            $g = ($colorat >> 8) & 0xFF;
+            $b = $colorat & 0xFF;
+            if(($r==253 && $g == 253 && $b ==253) || ($r==254 && $g == 254 && $b ==254)) {
+                imagesetpixel($thumb, $x, $y, $colorWhite);
+            }
+        }
+    }
+
+
+            if (!@$quality)
+                $quality = 90;
+            //Generate the file, and rename it to $newfilename
+            switch ($imgInfo[2])
+            {
+                case 1: imagegif($thumb, CFG_DOCUMENTROOT . $resizedfilename);
+                    break;
+                case 2: imagejpeg($thumb, CFG_DOCUMENTROOT . $resizedfilename, $quality);
+                    break;
+                case 3: imagepng($thumb, CFG_DOCUMENTROOT . $resizedfilename);
+                    break;
+                default: '';//trigger_error('Failed resize image!', E_USER_WARNING);
+                    break;
+            }
+
+            imagedestroy($thumb);
+            return($resizedfilename);
+        }
+    }
+
+    public static function CheckImage($imgcode)
+    {
+        //echo CFG_DOCUMENTROOT . $imgcode;
+        if (file_exists(CFG_DOCUMENTROOT . $imgcode) && preg_match("/\./", $imgcode))
+        {
+            $imgcodename = $imgcode;
+        }
+        else
+        {
+            $imgcodename = CFG_PRODUCTIMGDIR . "niks.jpg";
+        }
+        $imgcodename = str_replace("//", "/", "/" . $imgcodename);
+        return $imgcodename;
+    }
+
+    private static function _RemoteImage($src, $wmax, $hmax, $seonaam)
+    {
+        // 12.27
+        if (!in_array($_SERVER['DOCUMENT_ROOT'] . "/webshop/services/service.SEO.php", get_included_files())){
+            include $_SERVER['DOCUMENT_ROOT'] . '/webshop/services/service.SEO.php';
+        }
+
+        $seonaam = SEO::NaamNaarSEOUrl($seonaam);
+        $imgcodename = CFG_PIMAGES_REMOTE."/niks/".($wmax ? $wmax."/" : "").($hmax ? $hmax."/" : "")."niks.jpg";
+        if(preg_match("/pimages\//i", $src))
+        {
+            $pathArr = pathinfo($src);
+            $imgcodename = CFG_PIMAGES_REMOTE."/".$pathArr['filename']."/".($wmax ? $wmax."/" : "").($hmax ? $hmax."/" : "").$seonaam.".".$pathArr['extension'];
+        }
+        return $imgcodename;
+    }
+
+    // nooit aanroepen vanuit product overzicht! daar is deze functie te langzaam voor
+    public static function BestaatDezeAfbeeldingWelofNiet($src)
+    {
+        // error reporting even uitzetten voor warnings
+        Debug::ErrorReportingUit();
+        if(CFG_PIMAGES_REMOTE != "" && fopen(CFG_PIMAGES_REMOTE."/".$src, "r")){
+            return true;
+        }
+        elseif(file_exists(CFG_DOCUMENTROOT . $src))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+        // error reporting nu weer resetten aan de hand van de settings waarde
+        Debug::ErrorReportingConfigureer();
+    }
+
+    public static function MaxSize($originalImage, $toWidth, $toHeight)
+    {
+        //$dir = CFG_DOCUMENTROOT;
+        $fileInfo = pathinfo($originalImage);
+        $fileDir = '';
+        if (!empty($fileInfo['dirname'])) {
+            $fileDir = $fileInfo['dirname'].'/';
+        }
+
+        $newFileName = $fileInfo['filename'] . '-' . $toWidth . '-' . $toHeight . '-scaled.' . $fileInfo['extension'];
+
+        if(is_file(CFG_DOCUMENTROOT.$fileDir.$newFileName)) return $fileDir.$newFileName;
+        if(!is_file(CFG_DOCUMENTROOT.$originalImage)) return 'pimages/niks.jpg';
+
+
+
+        $type = mime_content_type(CFG_DOCUMENTROOT.$originalImage);
+
+        if ($type === 'image/svg+xml') {
+			return $originalImage;
+		}
+
+        list($width, $height) = getimagesize(CFG_DOCUMENTROOT.$originalImage);
+        $xscale=$width/$toWidth;
+        $yscale=$height/$toHeight;
+
+        if ($yscale>$xscale)
+        {
+          $new_width = round($width * (1/$yscale));
+          $new_height = round($height * (1/$yscale));
+        }else{
+          $new_width = round($width * (1/$xscale));
+          $new_height = round($height * (1/$xscale));
+        }
+
+        if ($yscale>$xscale)
+        {
+            if($yscale == 1) return $originalImage;
+        }else{
+            if($xscale == 1) return $originalImage;
+        }
+
+        $imageResized = imagecreatetruecolor($new_width, $new_height);
+
+        $size = getimagesize(CFG_DOCUMENTROOT.$originalImage);
+
+        switch($size["mime"])
+        {
+            case "image/jpeg":
+                $imageTmp = imagecreatefromjpeg(CFG_DOCUMENTROOT.$originalImage); //jpeg file
+                imagecopyresampled($imageResized, $imageTmp, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
+                imagejpeg($imageResized, CFG_DOCUMENTROOT.$fileDir.$newFileName, 100);
+
+                $exec = 'convert '.CFG_DOCUMENTROOT.$fileDir.$newFileName.' -sampling-factor 4:2:0 -strip -quality 90 -interlace JPEG -colorspace sRGB '.CFG_DOCUMENTROOT.$fileDir.$newFileName.'';
+                passthru($exec);
+                break;
+            case "image/png":
+                $imageTmp = imagecreatefrompng(CFG_DOCUMENTROOT.$originalImage); //png file
+                imagealphablending($imageResized, FALSE);
+                imagesavealpha($imageResized, TRUE);
+                imagecopyresampled($imageResized, $imageTmp, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
+                imagepng($imageResized, CFG_DOCUMENTROOT.$fileDir.$newFileName);
+                break;
+        }
+
+
+
+        return $fileDir.$newFileName;
+    }
+
+}
+
+?>`,
+        leftContent: `<?php
+
+class Image
+{
+    /**
+     * Maakt een thumbnail afbeelding van de originele afbeelding in $src
+     * Zal kaders toevoegen als de nieuwe verhoudingen van de afbeelding niet overeenkomen
+     * met de verhoudingen van de originele afbeelding
+     * @param srting $src               Bron locatie van het origineel
+     * @param int $wmax                 Breedte van de thumbnail mits deze kleiner is dan het origineel
+     * @param int $hmax                 Hoogte van de thumbnail mits deze kleiner is dan het origineel
+     * @param type $bgcol               Achtergrond kleur van de kaders
+     * @param type $seonaam
+     * @param type $position            Locatie van de afbeelding ten opzichte van de tumbnail
+     *                                  (de rest wordt met $bgcol opgevuld) ("boven", "onder" of "center")"
+     * @param string $watermark         Bron locatie van de watermark
+     * @param string $watermark_pos_h   Horizontale locatie van het watermerk ("boven" of "onder")
+     * @param string $watermark_pos_v   Verticale locatie van het watermerk ("links", "rechts"of "center")
+     * @param string $text              Toe te voegen text aan de afbeelding
+     * @param string $text_font         Font van de text (momenteel alleen Arial)
+     * @param string $text_pos_h        Horizontale locatie van de text ("boven" of "onder")
+     * @param string $text_pos_v        Verticale locatie van text ("links", "rechts"of "center")
+     * @return string           Locatie van de thumbnail
+     */
+    public static function GetImage($src, $wmax = "", $hmax = "", $bgcol = "", $seonaam = "image",$position="center" , $watermark = "", $watermark_pos_h = "boven", $watermark_pos_v = "center", $text = "", $text_font = "arial", $text_pos_h = "boven", $text_pos_v = "center")
+    {
+
+        if(CFG_PIMAGES_REMOTE && preg_match("/pimages\//i", $src))
+        {
+            return self::_RemoteImage($src, $wmax, $hmax, $seonaam);
+        }
+
+        $src = self::CheckImage($src);
+
+        $src = str_replace("//", "/", $src);
+        $src_noext = substr($src, 0, strrpos($src, "."));
+        $src_ext = substr($src, strrpos($src, ".") + 1, 6);
+        $size = getimagesize(CFG_DOCUMENTROOT . $src);
+        $orig_w = $size[0];
+        $orig_h = $size[1];
+
+        // Nieuw stukje code: als breedte OF hoogte 0 is dan de juiste proportie berekenen.
+        if (($wmax == 0 || $wmax == "") || ($hmax == 0 || $hmax == ""))
+        {
+            if (($wmax == 0 || $wmax == "") && ($hmax != 0 || $hmax != ""))
+            {
+                $wmax = round(($orig_w / 100) * ($hmax / ($orig_h / 100)));
+            }
+            else if (($hmax == 0 || $hmax == "") && ($wmax != 0 || $wmax != ""))
+            {
+                $hmax = round(($orig_h / 100) * ($wmax / ($orig_w / 100)));
+            }
+        }
+
+        if ($orig_w > $wmax && $orig_h > $hmax)
+        {
+            $thumb_w = $wmax;
+            $thumb_h = $hmax;
+            if ($thumb_w / $orig_w * $orig_h > $thumb_h)
+                $thumb_w = round($thumb_h * $orig_w / $orig_h);
+            else
+                $thumb_h = round($thumb_w * $orig_h / $orig_w);
+        }
+        else if ($orig_w > $wmax)
+        {
+            $thumb_w = $wmax;
+            $thumb_h = $orig_h;
+            if ($thumb_w / $orig_w * $orig_h > $thumb_h)
+                $thumb_w = round($thumb_h * $orig_w / $orig_h);
+            else
+                $thumb_h = round($thumb_w * $orig_h / $orig_w);
+        }
+        else if ($orig_h > $hmax)
+        {
+            $thumb_w = $orig_w;
+            $thumb_h = $hmax;
+            if ($thumb_w / $orig_w * $orig_h > $thumb_h)
+                $thumb_w = round($thumb_h * $orig_w / $orig_h);
+            else
+                $thumb_h = round($thumb_w * $orig_h / $orig_w);
+        }
+        else
+        {
+            $thumb_w = $orig_w;
+            $thumb_h = $orig_h;
+        }
+
+        //nieuwe bestandsnaam
+        $resizedfilename = $src_noext . "-" . $wmax . "-" . $hmax . "." . $src_ext;
+
+        if (file_exists(CFG_DOCUMENTROOT . $resizedfilename))
+        {
+            return $resizedfilename;
+        }
+        else
+        {
+            //Get Image size info
+            $img = CFG_DOCUMENTROOT . $src;
+            $imgInfo = getimagesize($img);
+            //bescherming tegen te grote plaatjes > 5Mb
+            if (filesize($img) > 5242880)
+            {
+                return "/" . CFG_PRODUCTIMGDIR . 'niks.jpg';
+            };
+            switch ($imgInfo[2])
+            {
+                case 1: $source = imagecreatefromgif($img);
+                    break;
+                case 2: $source = imagecreatefromjpeg($img);
+                    break;
+                case 6: $source = imagecreatefromjpeg($img);
+                    break;
+                case 3: $source = imagecreatefrompng($img);
+                    break;
+                default:
+                 //   trigger_error('Unsupported filetype! ', E_USER_WARNING);
+                    return;
+                    break;
+            }
+            /* Check if this image is PNG or GIF, then set if Transparent */
+            if (($imgInfo[2] == 1) || ( $imgInfo[2] == 3))
+            {
+                imagealphablending($source, true);
+                imagesavealpha($source, true);
+                $white = imagecolorallocate($thumb, 255, 255, 255);
+                $transparent = imagecolorallocatealpha($thumb, 255, 255, 255, 127);
+                imagefilledrectangle($thumb, 0, 0, $wmax - 1, $hmax - 1, $transparent);
+                imagecolortransparent($thumb, $white);
+            }
+
+            if ($bgcol)
+            {
+                $thumb = imagecreatetruecolor($wmax, $hmax);
+                imagefilledrectangle($thumb, 0, 0, $wmax - 1, $hmax - 1, intval($bgcol, 16));
+            }else{
+                $thumb = imagecreatetruecolor($thumb_w, $thumb_h);
+                $position="top";
+            }
+            if($position=="top")
+            {
+                $image_top = 0;
+            }
+            elseif($position=="bottom")
+            {
+                $image_top = round($hmax - $thumb_h);
+            }
+            else
+            {
+                $image_top = round(($hmax - $thumb_h) / 2);
+            }
+            imagecopyresampled($thumb, $source, round(($wmax - $thumb_w) / 2), $image_top, 0, 0, $thumb_w, $thumb_h, $orig_w, $orig_h);
+
+            // $watermark toevoegen
+            if (!empty($watermark)) {
+                $watermark = self::CheckImage($watermark);
+                $water_size = getimagesize(CFG_DOCUMENTROOT . $watermark);
+                $water_orig_w = $water_size[0];
+                $water_orig_h = $water_size[1];
+                $watermax_h = round($wmax / 4);
+                $watermax_w = round(($wmax / 3) * 2);
+                $water_final_height = -1;
+
+                if ($water_orig_h > $watermax_h ){
+                    $water_final_height = $watermax_h;
+                    $water_final_width = round(($water_final_height * $water_orig_w) /$water_orig_h );
+                } else if ($water_orig_w > $watermax_w || $water_final_width > $watermax_w) {
+                    $water_final_width = $watermax_w;
+                    $water_final_height = round(($water_final_width * $water_orig_h) /$water_orig_w );
+                } else {
+                    $water_final_height = $water_orig_h;
+                    $water_final_width = $water_orig_w;
+                }
+
+
+                //Get Image size info
+                $water_img = CFG_DOCUMENTROOT . $watermark;
+                $water_imgInfo = getimagesize($water_img);
+                //bescherming tegen te grote plaatjes > 5Mb
+                if (filesize($water_img) > 5242880)
+                {
+                    return;
+                };
+                switch ($water_imgInfo[2])
+                {
+                    case 1: $water_source = imagecreatefromgif($water_img);
+                        break;
+                    case 2: $water_source = imagecreatefromjpeg($water_img);
+                        break;
+                    case 6: $water_source = imagecreatefromjpeg($water_img);
+                        break;
+                    case 3: $water_source = imagecreatefrompng($water_img);
+                        break;
+                    default:
+                     //   trigger_error('Unsupported filetype! ', E_USER_WARNING);
+                        return;
+                        break;
+                }
+                if ($watermark_pos_h == "boven") {
+                    $water_final_y = 0;
+                } else if ($watermark_pos_h = "onder") {
+                    $water_final_y = round($hmax - $water_final_height);
+                }
+
+                if ($watermark_pos_v == "links") {
+                    $water_final_x = 0;
+                } else if ($watermark_pos_v == "rechts") {
+                    $water_final_x = $wmax - $water_final_width;
+                } else if ($watermark_pos_v == "center") {
+                    $water_final_x = round(($wmax / 2) - ($water_final_width / 2));
+                }
+
+                imagecopyresampled($thumb, $water_source, $water_final_x, $water_final_y, 0, 0, $water_final_width, $water_final_height, $water_orig_w, $water_orig_h);
+
+
+            }
+
+            if (!empty($text)) {
+
+                if ($text_font == "arial") {
+                    $font = CFG_DOCUMENTROOT."admin/includes/barcode/arialbd.ttf";
+
+                }
+                $font_size = round($wmax / 8);
+
+                $type_space = imagettfbbox($font_size, 0, $font, $text);
+
+                $text_width = abs($type_space[4] - $type_space[0]) + round( $wmax / 50);
+                $text_height = abs($type_space[5] - $type_space[1]) + round( $wmax / 50);
+
+
+                if ($text_pos_h == "boven") {
+                    $text_final_y = $text_height;
+                } else if ($text_pos_h == "onder"){
+                    $text_final_y = round($wmax - ($wmax / 32));
+                }
+
+                if ($text_pos_v == "links") {
+                    $text_final_x = round( $wmax / 50);
+                } else if ($text_pos_v == "rechts") {
+                    $text_final_x =  $wmax - $text_width;
+                } else if ($text_pos_v == "center") {
+                    $text_final_x = round(($wmax / 2) - ($text_width / 2));
+                }
+                imagettftext($thumb, $font_size, 0, $text_final_x, $text_final_y, "000000", $font, $text );
+            }
+
+        $dstHeight=$thumb_h;
+        $dstY=round(($hmax - $thumb_h) / 2);
+        $dstWidth=$thumb_w;
+         $dstX=round(($wmax - $thumb_w) / 2);
+
+
+       //bg distortion fix
+    $colorWhite = imagecolorallocate($thumb,255,255,255);
+    $processHeight = $dstHeight+$dstY;
+    $processWidth = $dstWidth+$dstX;
+    //Travel y axis
+    for($y=$dstY; $y<($processHeight); ++$y){
+        // Travel x axis
+        for($x=$dstX; $x<($processWidth); ++$x){
+            // Change pixel color
+            $colorat=imagecolorat($thumb, $x, $y);
+            $r = ($colorat >> 16) & 0xFF;
+            $g = ($colorat >> 8) & 0xFF;
+            $b = $colorat & 0xFF;
+            if(($r==253 && $g == 253 && $b ==253) || ($r==254 && $g == 254 && $b ==254)) {
+                imagesetpixel($thumb, $x, $y, $colorWhite);
+            }
+        }
+    }
+
+
+            //Generate the file, and rename it to $newfilename
+            switch ($imgInfo[2])
+            {
+                case 1: imagegif($thumb, CFG_DOCUMENTROOT . $resizedfilename);
+                    break;
+                case 2: imagejpeg($thumb, CFG_DOCUMENTROOT . $resizedfilename, 100);
+                    $exec = 'convert '.CFG_DOCUMENTROOT . $resizedfilename.' -brightness-contrast 2 -sampling-factor 4:2:0 -strip -quality 90 -interlace JPEG -colorspace sRGB '.CFG_DOCUMENTROOT . $resizedfilename.'';
+                    passthru($exec);
+                    break;
+                case 3: imagepng($thumb, CFG_DOCUMENTROOT . $resizedfilename);
+                    break;
+                default: '';//trigger_error('Failed resize image!', E_USER_WARNING);
+                    break;
+            }
+
+
+
+            imagedestroy($thumb);
+            return($resizedfilename);
+        }
+    }
+
+    public static function GetProductImage($src, $wmax = "", $hmax = "", $crop=false,$nice=true)
+    {
+        if(!is_dir(CFG_DOCUMENTROOT.CFG_PRODUCTIMGDIR.'/cache')){
+            mkdir(CFG_DOCUMENTROOT.CFG_PRODUCTIMGDIR.'/cache');
+        }
+
+        $cacheDirName = CFG_PRODUCTIMGDIR.'/cache/';
+
+        if(isset($_GET['resetimages'])){
+            self::resetCropImage($src,$cacheDirName);
+        }
+
+        if($crop && 1 != 1)
+        {
+            if(is_file(CFG_DOCUMENTROOT.$src))
+            {
+                $fileDir  = pathinfo($src);
+                $fileInfo = pathinfo(CFG_DOCUMENTROOT.$src);
+
+                if(isset($fileInfo['extension']))
+                {
+                    $croppedFileName = $fileInfo['filename'].'.crop.'.$fileInfo['extension'];
+
+                    $croppedFile = $cacheDirName.$croppedFileName;
+
+                    if(!is_file(CFG_DOCUMENTROOT.$croppedFile)){
+                        copy($fileInfo['dirname'].'/'.$fileInfo['basename'],CFG_DOCUMENTROOT.$cacheDirName.$croppedFileName);
+                        self::smartCropImage($croppedFile,$nice);
+                    }
+                    $src = $cacheDirName.$croppedFileName;
+                }
+            }
+        }
+
+        $src = self::CheckImage($src);
+
+        $src = str_replace("//", "/", $src);
+        $src_noext = substr($src, 0, strrpos($src, "."));
+        $src_ext = substr($src, strrpos($src, ".") + 1, 6);
+
+
+        $size = getimagesize(CFG_DOCUMENTROOT . $src);
+        $orig_w = $size[0];
+        $orig_h = $size[1];
+
+        // Nieuw stukje code: als breedte OF hoogte 0 is dan de juiste proportie berekenen.
+        if (($wmax == 0 || $wmax == "") || ($hmax == 0 || $hmax == ""))
+        {
+            if (($wmax == 0 || $wmax == "") && ($hmax != 0 || $hmax != ""))
+            {
+                $wmax = round(($orig_w / 100) * ($hmax / ($orig_h / 100)));
+            }
+            else if (($hmax == 0 || $hmax == "") && ($wmax != 0 || $wmax != ""))
+            {
+                $hmax = round(($orig_h / 100) * ($wmax / ($orig_w / 100)));
+            }
+        }
+
+        if ($orig_w > $wmax && $orig_h > $hmax)
+        {
+            $thumb_w = $wmax;
+            $thumb_h = $hmax;
+            if ($thumb_w / $orig_w * $orig_h > $thumb_h)
+                $thumb_w = round($thumb_h * $orig_w / $orig_h);
+            else
+                $thumb_h = round($thumb_w * $orig_h / $orig_w);
+        }
+        else if ($orig_w > $wmax)
+        {
+            $thumb_w = $wmax;
+            $thumb_h = $hmax; //$orig_h;
+
+            if ($thumb_w / $orig_w * $orig_h > $thumb_h)
+                $thumb_w = round($thumb_h * $orig_w / $orig_h);
+            else
+                $thumb_h = round($thumb_w * $orig_h / $orig_w);
+        }
+        else if ($orig_h > $hmax)
+        {
+            $thumb_w = $orig_w;
+            $thumb_h = $hmax;
+            if ($thumb_w / $orig_w * $orig_h > $thumb_h)
+                $thumb_w = round($thumb_h * $orig_w / $orig_h);
+            else
+                $thumb_h = round($thumb_w * $orig_h / $orig_w);
+        }
+        else
+        {
+            $thumb_w = $orig_w;
+            $thumb_h = $orig_h;
+        }
+
+        //nieuwe bestandsnaam
+        $resizedfilename = $src_noext . "-" . $wmax . "-" . $hmax . "." . $src_ext;
+
+        if (file_exists(CFG_DOCUMENTROOT . $resizedfilename))
+        {
+            return $resizedfilename;
+        }
+        else
+        {
+            //Get Image size info
+            $img = CFG_DOCUMENTROOT . $src;
+            $imgInfo = getimagesize($img);
+            //bescherming tegen te grote plaatjes > 5Mb
+            if (filesize($img) > 5242880)
+            {
+                return "/" . CFG_PRODUCTIMGDIR . 'niks.jpg';
+            };
+
+            ini_set('memory_limit','2048M');
+
+            switch ($imgInfo[2])
+            {
+                case 1: $source = imagecreatefromgif($img);
+                    break;
+                case 2: $source = imagecreatefromjpeg($img);
+                    break;
+                case 6: $source = imagecreatefromjpeg($img);
+                    break;
+                case 3: $source = imagecreatefrompng($img);
+                    break;
+                default:
+                 //   trigger_error('Unsupported filetype! ', E_USER_WARNING);
+                    return;
+                    break;
+            }
+
+            $thumb = imagecreatetruecolor($wmax, $hmax);
+            $white = imagecolorallocate($thumb, 255, 255, 255);
+            imagefill($thumb, 0, 0, $white);
+
+            /* Check if this image is PNG or GIF, then set if Transparent */
+            if (($imgInfo[2] == 1) || ( $imgInfo[2] == 3))
+            {
+                imagealphablending($source, true);
+                imagesavealpha($source, true);
+                $white = imagecolorallocate($thumb, 255, 255, 255);
+                $transparent = imagecolorallocatealpha($thumb, 255, 255, 255, 127);
+                imagefilledrectangle($thumb, 0, 0, $wmax - 1, $hmax - 1, $transparent);
+                imagecolortransparent($thumb, $white);
+            }
+
+            imagecopyresampled($thumb, $source, round(($wmax - $thumb_w) / 2), (($hmax - $thumb_h) / 2), 0, 0, $thumb_w, $thumb_h, $orig_w, $orig_h);
+
+            if (!@$quality) $quality = 100;
+            //Generate the file, and rename it to $newfilename
+            switch ($imgInfo[2])
+            {
+                case 1: imagegif($thumb, CFG_DOCUMENTROOT . $resizedfilename);
+                    break;
+                case 2: imagejpeg($thumb, CFG_DOCUMENTROOT . $resizedfilename, 100);
+
+                    $exec = 'convert '.CFG_DOCUMENTROOT . $resizedfilename.' -sampling-factor 4:2:0 -strip -quality 80 -interlace JPEG -colorspace sRGB '.CFG_DOCUMENTROOT . $resizedfilename.'';
+
+                    passthru($exec);
+
+                    break;
+                case 3: imagepng($thumb, CFG_DOCUMENTROOT . $resizedfilename);
+                    break;
+                default: '';//trigger_error('Failed resize image!', E_USER_WARNING);
+                    break;
+            }
+
+            imagedestroy($thumb);
+            return($resizedfilename);
+        }
+    }
+
+    public static function resetCropImage($src,$directory)
+    {
+        if(!isset($_GET['resetimages'])) return;
+
+        $srcArr = pathinfo($src);
+
+        print_r($srcArr);
+
+        $files = scandir(CFG_DOCUMENTROOT.$directory);
+
+        foreach($files as $file)
+        {
+            $fileArr = pathinfo($file);
+
+            if(stristr($fileArr['filename'], $srcArr['filename']))
+            {
+                echo '-> '.$file.PHP_EOL;
+            }
+        }
+    }
+
+    public static function smartCropImage($originalImage,$nice=false)
+    {
+        if(!is_file(CFG_DOCUMENTROOT.$originalImage)) return;
+
+        $tempImageDir  = CFG_DOCUMENTROOT.'temp/cropcache/';
+        $tempImageName = uniqid().'-'.date('Ymdhis').'.jpg';
+        $jsonFile      = uniqid().'-'.date('Ymdhis').'.txt';
+
+        $execNice = '';
+        if($nice){
+            $execNice = 'nice -19 ';
+        }
+
+        //$exec = 'convert '.CFG_DOCUMENTROOT.$originalImage.' -canny 0x1+90%+30% -separate -evaluate-sequence max -blur 0x5 -equalize '.$tempImageDir.$tempImageName;
+        $exec = $execNice.'convert '.CFG_DOCUMENTROOT.$originalImage.' -modulate 125% -separate -evaluate-sequence max -blur 0x5 -equalize '.$tempImageDir.$tempImageName;
+        exec($exec);
+
+        $exec = $execNice.'convert '.$tempImageDir.$tempImageName.' -trim -crop 1x1+10+10@ info: > '.$tempImageDir.$jsonFile.' ';
+        exec($exec);
+
+        $cropInfo = file_get_contents($tempImageDir.$jsonFile);
+        $cropInfo = explode(' ',$cropInfo);
+        $newFileSize = explode('x',$cropInfo[2]);
+        $cropXYPos   = explode('+',$cropInfo[3]);
+
+        $newImageWidth  = $newFileSize[0];
+        $newImageHeight = $newFileSize[1];
+        $newImageStartX = $cropXYPos[1];
+        $newImageStartY = $cropXYPos[2];
+
+        $exec = $execNice.'convert '.CFG_DOCUMENTROOT.$originalImage.' -crop ' . $newImageWidth . 'x' . $newImageHeight . '+' . $newImageStartX . '+'. $newImageStartY . ' -bordercolor white -border 10x10 -interlace JPEG -colorspace sRGB '.CFG_DOCUMENTROOT.$originalImage;
+        exec($exec);
+
+        unlink($tempImageDir.$tempImageName);
+        unlink($tempImageDir.$jsonFile);
+        return;
+    }
+
+    public static function cropImage($originalImage)
+    {
+        if(ISFACTIF)
+        {
+            if(!is_file(CFG_DOCUMENTROOT.$originalImage)) return;
+
+            $tempImageDir  = CFG_DOCUMENTROOT.'temp/cropcache/';
+            $tempImageName = uniqid().'-'.date('Ymdhis').'.jpg';
+            $jsonFile      = uniqid().'-'.date('Ymdhis').'.txt';
+
+            $exec = 'convert '.CFG_DOCUMENTROOT.$originalImage.' -canny 0x1+90%+30% -separate -evaluate-sequence max -blur 0x5 -equalize '.$tempImageDir.$tempImageName;
+            $exec = 'convert '.CFG_DOCUMENTROOT.$originalImage.' -modulate 125% -separate -evaluate-sequence max -blur 0x5 -equalize '.$tempImageDir.$tempImageName;
+            exec($exec);
+
+            $exec = 'convert '.$tempImageDir.$tempImageName.' -trim -crop 1x1+10+10@ info: > '.$tempImageDir.$jsonFile.' ';
+            exec($exec);
+
+            $cropInfo = file_get_contents($tempImageDir.$jsonFile);
+            $cropInfo = explode(' ',$cropInfo);
+            $newFileSize = explode('x',$cropInfo[2]);
+            $cropXYPos   = explode('+',$cropInfo[3]);
+
+            $newImageWidth  = $newFileSize[0];
+            $newImageHeight = $newFileSize[1];
+            $newImageStartX = $cropXYPos[1];
+            $newImageStartY = $cropXYPos[2];
+
+            $exec = 'convert '.CFG_DOCUMENTROOT.$originalImage.' -crop ' . $newImageWidth . 'x' . $newImageHeight . '+' . $newImageStartX . '+'. $newImageStartY . ' -bordercolor white -border 10x10 -interlace JPEG -colorspace sRGB '.CFG_DOCUMENTROOT.$originalImage;
+            exec($exec);
+
+            unlink($tempImageDir.$tempImageName);
+            unlink($tempImageDir.$jsonFile);
+            return;
+        }
+
+        if(!is_file($originalImage)) return;
+
+        $exec = 'convert '.$originalImage.' -trim -crop 1x1+10+10@ -bordercolor white -border 50x50 '.$originalImage.'';
+        passthru($exec);
+    }
+
+    public static function CheckImage($imgcode)
+    {
+        //echo CFG_DOCUMENTROOT . $imgcode;
+        if (file_exists(CFG_DOCUMENTROOT . $imgcode) && preg_match("/\./", $imgcode))
+        {
+            $imgcodename = $imgcode;
+        }
+        else
+        {
+            $imgcodename = CFG_PRODUCTIMGDIR . "niks.jpg";
+        }
+        $imgcodename = str_replace("//", "/", "/" . $imgcodename);
+        return $imgcodename;
+    }
+
+    private static function _RemoteImage($src, $wmax, $hmax, $seonaam)
+    {
+        $seonaam = SEO::NaamNaarSEOUrl($seonaam);
+        $imgcodename = CFG_PIMAGES_REMOTE."/niks/".($wmax ? $wmax."/" : "").($hmax ? $hmax."/" : "")."niks.jpg";
+        if(preg_match("/pimages\//i", $src))
+        {
+            $pathArr = pathinfo($src);
+            $imgcodename = CFG_PIMAGES_REMOTE."/".$pathArr['filename']."/".($wmax ? $wmax."/" : "").($hmax ? $hmax."/" : "").$seonaam.".".$pathArr['extension'];
+        }
+        return $imgcodename;
+    }
+
+    // nooit aanroepen vanuit product overzicht! daar is deze functie te langzaam voor
+    public static function BestaatDezeAfbeeldingWelofNiet($src)
+    {
+        // error reporting even uitzetten voor warnings
+        Debug::ErrorReportingUit();
+        if(CFG_PIMAGES_REMOTE != "" && fopen(CFG_PIMAGES_REMOTE."/".$src, "r")){
+            return true;
+        }
+        elseif(file_exists(CFG_DOCUMENTROOT . $src))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+        // error reporting nu weer resetten aan de hand van de settings waarde
+        Debug::ErrorReportingConfigureer();
+    }
+
+    public static function MaxSize($originalImage, $toWidth, $toHeight)
+    {
+        //$dir = CFG_DOCUMENTROOT;
+        $fileInfo = pathinfo($originalImage);
+        $fileDir = '';
+        if (!empty($fileInfo['dirname'])) {
+            $fileDir = $fileInfo['dirname'].'/';
+        }
+
+        $newFileName = $fileInfo['filename'] . '-' . $toWidth . '-' . $toHeight . '-scaled.' . $fileInfo['extension'];
+
+        if(is_file(CFG_DOCUMENTROOT.$fileDir.$newFileName)) return $fileDir.$newFileName;
+        if(!is_file(CFG_DOCUMENTROOT.$originalImage)) return 'pimages/niks.jpg';
+
+
+
+        $type = mime_content_type(CFG_DOCUMENTROOT.$originalImage);
+
+        if ($type === 'image/svg+xml') {
+			return $originalImage;
+		}
+
+        list($width, $height) = getimagesize(CFG_DOCUMENTROOT.$originalImage);
+        $xscale=$width/$toWidth;
+        $yscale=$height/$toHeight;
+
+        if ($yscale>$xscale)
+        {
+          $new_width = round($width * (1/$yscale));
+          $new_height = round($height * (1/$yscale));
+        }else{
+          $new_width = round($width * (1/$xscale));
+          $new_height = round($height * (1/$xscale));
+        }
+
+        if ($yscale>$xscale)
+        {
+            if($yscale == 1) return $originalImage;
+        }else{
+            if($xscale == 1) return $originalImage;
+        }
+
+        $imageResized = imagecreatetruecolor($new_width, $new_height);
+
+        $size = getimagesize(CFG_DOCUMENTROOT.$originalImage);
+
+        switch($size["mime"])
+        {
+            case "image/jpeg":
+                $imageTmp = imagecreatefromjpeg(CFG_DOCUMENTROOT.$originalImage); //jpeg file
+                imagecopyresampled($imageResized, $imageTmp, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
+                imagejpeg($imageResized, CFG_DOCUMENTROOT.$fileDir.$newFileName, 100);
+
+                $exec = 'convert '.CFG_DOCUMENTROOT.$fileDir.$newFileName.' -sampling-factor 4:2:0 -strip -quality 90 -interlace JPEG -colorspace sRGB '.CFG_DOCUMENTROOT.$fileDir.$newFileName.'';
+                passthru($exec);
+                break;
+            case "image/png":
+                $imageTmp = imagecreatefrompng(CFG_DOCUMENTROOT.$originalImage); //png file
+                imagealphablending($imageResized, FALSE);
+                imagesavealpha($imageResized, TRUE);
+                imagecopyresampled($imageResized, $imageTmp, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
+                imagepng($imageResized, CFG_DOCUMENTROOT.$fileDir.$newFileName);
+                break;
+        }
+
+
+
+        return $fileDir.$newFileName;
+    }
+
+}
+
+?>`
+      },
+      {
         rightContent: `<body>
   Lorem Ispum
 </body>`,
