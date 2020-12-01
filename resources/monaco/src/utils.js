@@ -1,12 +1,25 @@
 let cacheActionsLines = [];
-let diffActionsNode, diffEditor, ignoreChange = false;
+let diffActionsNode,
+  diffEditor,
+  ignoreChange = false;
 
-export function render(_diffEditor, { rightPath, notSupportedFile, leftContent, rightContent, theme, tabSize }) {
+export function render(
+  _diffEditor,
+  { rightPath, notSupportedFile, leftContent, rightContent, theme, tabSize }
+) {
   diffEditor = _diffEditor;
   window.diffEditor = _diffEditor;
   diffEditor.setModel({
-    original: monaco.editor.createModel(leftContent, null, generateMonacoFakeUri(rightPath, 'org')),
-    modified: monaco.editor.createModel(rightContent, null, generateMonacoFakeUri(rightPath, 'mod'))
+    original: monaco.editor.createModel(
+      leftContent,
+      null,
+      generateMonacoFakeUri(rightPath, 'org')
+    ),
+    modified: monaco.editor.createModel(
+      rightContent,
+      null,
+      generateMonacoFakeUri(rightPath, 'mod')
+    ),
   });
   diffActionsNode = createDiffActionsContainer(diffEditor);
   window.diffNavigator = monaco.editor.createDiffNavigator(diffEditor);
@@ -18,10 +31,11 @@ export function render(_diffEditor, { rightPath, notSupportedFile, leftContent, 
 }
 
 function setTabSize(tabSize) {
-    const { originalEditor, modifiedEditor } = diffEditor;
-    const updateTabSize = model => model.updateOptions({ tabSize, detectIndentation: false });
-    updateTabSize(originalEditor.getModel());
-    updateTabSize(modifiedEditor.getModel());
+  const { originalEditor, modifiedEditor } = diffEditor;
+  const updateTabSize = (model) =>
+    model.updateOptions({ tabSize, detectIndentation: false });
+  updateTabSize(originalEditor.getModel());
+  updateTabSize(modifiedEditor.getModel());
 }
 
 function setEditorValue(editor, value) {
@@ -40,7 +54,7 @@ export function swap() {
 function generateMonacoFakeUri(path, qs) {
   if (path) {
     const prefixPath = path.startsWith('/') ? '' : '/';
-    return monaco.Uri.parse(`vscode://${prefixPath}${path}?${qs}`)
+    return monaco.Uri.parse(`vscode://${prefixPath}${path}?${qs}`);
   }
   return null;
 }
@@ -51,34 +65,35 @@ function onDidUpdateDiff() {
     return;
   }
   vscode.postMessage({
-    command: 'change'
+    command: 'change',
   });
 }
 
 export function addDiffActions(diffEditor) {
-  const changes = diffEditor.getLineChanges();
-  waitForChangesDecorations()
-    .then(() => {
-      const changesData = changes.map(change => ({
-        change,
-        ...getStrategy(change)
-      }));
-      const actionsLines = changesData.map(({top}) => top);
-      const actions = Array.from(diffActionsNode.querySelectorAll('.diffAction'));
+  waitForChangesDecorations().then(() => {
+    const changes = diffEditor.getLineChanges();
+    const changesData = changes.map((change) => ({
+      change,
+      ...getStrategy(change),
+    }));
+    const actionsLines = changesData.map(({ top }) => top);
+    const actions = Array.from(diffActionsNode.querySelectorAll('.diffAction'));
 
-      changesData.forEach(({change, top, replacer}) => {
-        createOrUpdateDiffAction(diffActionsNode, top, () => {
-          const originalLines = getChangeOriginalValue(change, diffEditor);
-          applyOriginalLines(originalLines, replacer, diffEditor);
-        });
+    changesData.forEach(({ change, top, replacer }) => {
+      createOrUpdateDiffAction(diffActionsNode, top, () => {
+        const originalLines = getChangeOriginalValue(change, diffEditor);
+        applyOriginalLines(originalLines, replacer, diffEditor);
       });
-      cacheActionsLines.forEach(actionLine => {
-        if (!actionsLines.includes(actionLine)) {
-          diffActionsNode.removeChild(actions.find(action => action.style.top === `${actionLine}px`));
-        }
-      });
-      cacheActionsLines = actionsLines;
     });
+    cacheActionsLines.forEach((actionLine) => {
+      if (!actionsLines.includes(actionLine)) {
+        diffActionsNode.removeChild(
+          actions.find((action) => action.style.top === `${actionLine}px`)
+        );
+      }
+    });
+    cacheActionsLines = actionsLines;
+  });
 }
 
 function getStrategy(change) {
@@ -86,59 +101,69 @@ function getStrategy(change) {
   const isChangeInModifiedSide = change.originalEndLineNumber === 0;
   if (isChangeInModifiedSide) {
     return {
-      top: diffEditor.modifiedEditor.getTopForLineNumber(change.modifiedStartLineNumber),
+      top: diffEditor.modifiedEditor.getTopForLineNumber(
+        change.modifiedStartLineNumber
+      ),
       replacer: () => {
         const startLine = change.modifiedStartLineNumber - 1;
         return {
           startLine,
           linesToRemove: change.modifiedEndLineNumber - startLine,
-        }
-      }
-    }
+        };
+      },
+    };
   } else if (isChangeInOriginalSide) {
     return {
-      top: diffEditor.originalEditor.getTopForLineNumber(change.originalStartLineNumber),
+      top: diffEditor.originalEditor.getTopForLineNumber(
+        change.originalStartLineNumber
+      ),
       replacer: () => {
         const startLine = change.modifiedStartLineNumber;
         return {
           startLine,
           linesToRemove: 0,
-        }
-      }
-    }
+        };
+      },
+    };
   }
   return {
-    top: diffEditor.originalEditor.getTopForLineNumber(change.originalStartLineNumber),
+    top: diffEditor.originalEditor.getTopForLineNumber(
+      change.originalStartLineNumber
+    ),
     replacer: () => {
       const startLine = change.modifiedStartLineNumber - 1;
       return {
         startLine,
-        linesToRemove: (change.modifiedEndLineNumber - change.modifiedStartLineNumber) + 1,
-      }
-    }
-  }
+        linesToRemove:
+          change.modifiedEndLineNumber - change.modifiedStartLineNumber + 1,
+      };
+    },
+  };
 }
 
 function applyOriginalLines(originalLines, replacer, diffEditor) {
-  let {startLine, linesToRemove} = replacer();
+  let { startLine, linesToRemove } = replacer();
   const diff = {
-      range: new monaco.Range(++startLine, 0, startLine + linesToRemove, 0),
-      text: originalLines
-    };
+    range: new monaco.Range(++startLine, 0, startLine + linesToRemove, 0),
+    text: originalLines,
+  };
   diffEditor.modifiedEditor.executeEdits('diff-merge', [diff]);
 }
 
 function getChangeOriginalValue(change, diffEditor) {
-  return diffEditor.originalEditor.getValue()
-                                  .split(/(?<=[\n\r])/gm)
-                                  .slice(change.originalStartLineNumber - 1, change.originalEndLineNumber)
-                                  .join('');
+  return diffEditor.originalEditor
+    .getValue()
+    .split(/(?<=[\n\r])/gm)
+    .slice(change.originalStartLineNumber - 1, change.originalEndLineNumber)
+    .join('');
 }
 
 function createOrUpdateDiffAction(diffActionsNode, top, onCopy) {
   // action is already in place
   if (cacheActionsLines.includes(top)) {
-    const action = diffActionsNode.querySelector(`.diffAction[data-top="${top}"]`);
+    const action = diffActionsNode.querySelector(
+      `.diffAction[data-top="${top}"]`
+    );
     action.onclick = onCopy;
   } else {
     const action = document.createElement('div');
@@ -146,20 +171,28 @@ function createOrUpdateDiffAction(diffActionsNode, top, onCopy) {
     action.dataset.top = top;
     action.innerHTML = '→';
     action.style.top = `${top}px`;
-    action.onclick =  onCopy;
+    action.onclick = onCopy;
     diffActionsNode.appendChild(action);
   }
 }
 
-function createDiffActionsContainer(diffEditor) {
+export function layoutDiffContainer(diffActions = diffActionsNode) {
   const modifedEditorNode = diffEditor.modifiedEditor.getDomNode();
+  diffActions.style.left = `${
+    modifedEditorNode.getBoundingClientRect().left
+  }px`;
+}
+
+function createDiffActionsContainer(diffEditor) {
   const diffActions = document.createElement('div');
   diffActions.className = 'diffActions diffOverview';
-  diffActions.style.height = `${diffEditor.originalEditor.getScrollHeight()}px`
-  modifedEditorNode.appendChild(diffActions);
-  diffEditor.modifiedEditor.onDidScrollChange(({scrollTop}) => {
+  diffActions.style.height = `${diffEditor.originalEditor.getScrollHeight()}px`;
+  document.querySelector('#container').appendChild(diffActions);
+
+  diffEditor.modifiedEditor.onDidScrollChange(({ scrollTop }) => {
     diffActions.style.top = `-${scrollTop}px`;
   });
+  layoutDiffContainer(diffActions);
   return diffActions;
 }
 
@@ -180,31 +213,35 @@ function waitForChangesDecorations() {
 }
 
 function isSaveShortcut(e) {
-  return (window.navigator.platform.match('Mac') ?
-      e.metaKey :
-      e.ctrlKey) &&
-    e.keyCode == 83;
+  return (
+    (window.navigator.platform.match('Mac') ? e.metaKey : e.ctrlKey) &&
+    e.keyCode == 83
+  );
 }
 
 function bindSaveShortcut() {
-  document.addEventListener('keydown', e => {
-    if (isSaveShortcut(e)) {
-      e.preventDefault();
-      vscode.postMessage({
-        command: 'save',
-        contents: {
-          left: diffEditor.originalEditor.getValue(),
-          right: diffEditor.modifiedEditor.getValue()
-        }
-      });
-    }
-  },
-  false
+  document.addEventListener(
+    'keydown',
+    (e) => {
+      if (isSaveShortcut(e)) {
+        e.preventDefault();
+        vscode.postMessage({
+          command: 'save',
+          contents: {
+            left: diffEditor.originalEditor.getValue(),
+            right: diffEditor.modifiedEditor.getValue(),
+          },
+        });
+      }
+    },
+    false
   );
 }
 
 function extractEditorStyles(diffEditor) {
-  const lineHeight = diffEditor.modifiedEditor.getOption(monaco.editor.EditorOption.lineHeight);
+  const lineHeight = diffEditor.modifiedEditor.getOption(
+    monaco.editor.EditorOption.lineHeight
+  );
   document.body.style.setProperty('--diff-merge-lineheight', `${lineHeight}px`);
 }
 
@@ -217,13 +254,15 @@ function setTheme(theme) {
 }
 
 function retrieveCssVariables() {
-  const isNumber = s => !isNaN(Number(s));
+  const isNumber = (s) => !isNaN(Number(s));
 
   const htmlTag = document.querySelector('html');
   const compotedStyle = getComputedStyle(htmlTag);
 
-  return Object.keys(htmlTag.style).filter(isNumber).reduce((ol, ne) => {
-    ol[htmlTag.style[ne]] = compotedStyle.getPropertyValue(htmlTag.style[ne])
-    return ol;
-  }, {})
+  return Object.keys(htmlTag.style)
+    .filter(isNumber)
+    .reduce((ol, ne) => {
+      ol[htmlTag.style[ne]] = compotedStyle.getPropertyValue(htmlTag.style[ne]);
+      return ol;
+    }, {});
 }

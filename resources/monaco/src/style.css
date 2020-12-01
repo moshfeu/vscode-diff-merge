@@ -1,4 +1,5 @@
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   width: 100vw;
@@ -12,9 +13,11 @@ html, body {
 
 .diffActions {
   position: absolute;
-  top:0;
+  top: 0;
   left: 0;
-  width: 20px;
+  width: 15px;
+  padding: 0 2px;
+  box-sizing: border-box;
 }
 
 .diffAction {
