@@ -10,3 +10,6 @@ vsc-extension-quickstart.md
 **/*.map
 **/*.ts
 resources/**/node_modules
+azure-pipelines.yml
+.github
+.env
