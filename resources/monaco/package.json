@@ -6,6 +6,9 @@
   "scripts": {
     "start": "http-server -p 12345",
     "build": "webpack",
+    "mocha": "mocha dist/test.bundle.js",
+    "test:unit": "webpack --config webpack.config.test.js && yarn mocha",
+    "test:unit:dev": "webpack --config webpack.config.test.dev.js",
     "build:dev": "webpack --config webpack.config.dev.js --watch"
   },
   "dependencies": {
@@ -15,6 +18,7 @@
     "css-loader": "^3.2.1",
     "file-loader": "^5.0.2",
     "http-server": "^0.12.0",
+    "mocha": "^8.3.0",
     "style-loader": "^1.0.1",
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.10",
