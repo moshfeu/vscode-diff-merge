@@ -4,5 +4,5 @@ const merge = require('webpack-merge');
 module.exports = merge(config, {
   mode: 'development',
   watch: true,
-  devtool: 'eval-source-map'
+  devtool: 'inline-source-map',
 });

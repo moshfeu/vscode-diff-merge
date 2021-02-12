@@ -1,3 +1,5 @@
+/// <reference path="../node_modules/monaco-editor/monaco.d.ts" />
+
 let cacheActionsLines = [];
 let diffActionsNode,
   diffEditor,
@@ -51,6 +53,10 @@ export function swap() {
   setEditorValue(modifiedEditor, leftValue);
 }
 
+/**
+ * @param {string} path
+ * @param {string} qs
+ */
 function generateMonacoFakeUri(path, qs) {
   if (path) {
     const prefixPath = path.startsWith('/') ? '' : '/';
@@ -150,9 +156,10 @@ function applyOriginalLines(originalLines, replacer, diffEditor) {
   diffEditor.modifiedEditor.executeEdits('diff-merge', [diff]);
 }
 
-function getChangeOriginalValue(change, diffEditor) {
+export function getChangeOriginalValue(change, diffEditor) {
   return diffEditor.originalEditor
     .getValue()
+    .replace(/\r\n/g, '\n')
     .split(/(?<=[\n\r])/gm)
     .slice(change.originalStartLineNumber - 1, change.originalEndLineNumber)
     .join('');
