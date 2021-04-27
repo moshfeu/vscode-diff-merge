@@ -25,16 +25,32 @@ Found a bug? Have an extra ordinary idea? Please create an [issue](https://githu
 
 <img width="463" alt="explorer - context" src="https://user-images.githubusercontent.com/3723951/69405996-b4f45680-0d09-11ea-9b9f-f24f9e9c69a5.png">
 
+Or
+
+### File against selected file (#40)
+
+<details>
+  <img width="463" src="https://user-images.githubusercontent.com/3723951/116193146-92087600-a737-11eb-8f6f-de6dca038b8f.gif" />
+</details>
+
+**How to use?**
+
+1. Right click on a file <sup>[1]</sup> in _explorer_ panel or on an editor tab
+2. Click `[Diff & Merge] Select file to compare`
+3. Right click on another file or an editor tab
+4. Click `[Diff & Merge] Compare file with selected file`
 
 ### 2. Diff and merge - file against clipboard (#25)
 
-<img width="463" src="https://user-images.githubusercontent.com/3723951/98452048-7cd16800-2154-11eb-9a3c-cdc8fe73aa90.gif" />
+<details>
+  <img width="463" src="https://user-images.githubusercontent.com/3723951/98452048-7cd16800-2154-11eb-9a3c-cdc8fe73aa90.gif" />
+</details>
 
 **How to use?**
 
 1. Right click on a file <sup>[1]</sup> in _explorer_ panel
-1. Click on `[Diff & Merge] Choose a file to merge`
-1. Choose a file <sup>[1]</sup> to compare
+2. Click `[Diff & Merge] Choose a file to merge`
+3. Choose a file <sup>[1]</sup> to compare
 
 ### 3. Diff and merge - git - file against older version
 
