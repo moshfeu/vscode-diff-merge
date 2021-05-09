@@ -2,7 +2,7 @@
   "name": "diff-merge",
   "displayName": "Diff & Merge",
   "description": "Show diffs and merge",
-  "version": "0.4.3",
+  "version": "0.5.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/moshfeu/vscode-diff-merge"
@@ -67,12 +67,24 @@
     "menus": {
       "explorer/context": [
         {
+          "command": "diffMerge.selectToCompare",
+          "when": "!explorerResourceIsFolder && !listMultiSelection",
+          "group": "3_compare@100"
+        },
+        {
+          "command": "diffMerge.compareWithSelected",
+          "when": "!explorerResourceIsFolder && !listMultiSelection && diffMergeFileSelected",
+          "group": "3_compare@101"
+        },
+        {
           "command": "diffMerge.chooseFile",
-          "when": "!explorerResourceIsFolder && !listMultiSelection"
+          "when": "!explorerResourceIsFolder && !listMultiSelection",
+          "group": "3_compare@102"
         },
         {
           "command": "diffMerge.compareSelected",
-          "when": "listDoubleSelection"
+          "when": "listDoubleSelection",
+          "group": "3_compare@103"
         }
       ],
       "scm/resourceState/context": [
@@ -99,7 +111,17 @@
       ],
       "editor/title/context": [
         {
-          "command": "diffMerge.compareFileWithClipboard"
+          "command": "diffMerge.selectToCompare",
+          "group": "z@100"
+        },
+        {
+          "command": "diffMerge.compareWithSelected",
+          "when": "diffMergeFileSelected",
+          "group": "z@101"
+        },
+        {
+          "command": "diffMerge.compareFileWithClipboard",
+          "group": "z@102"
         }
       ],
       "commandPalette": [
@@ -166,7 +188,7 @@
         "command": "diffMerge.chooseFile"
       },
       {
-        "title": "[Diff & Merge] Compare Selected",
+        "title": "[Diff & Merge] Compare Selected files",
         "command": "diffMerge.compareSelected"
       },
       {
@@ -180,6 +202,14 @@
       {
         "title": "[Diff & Merge] Compare file with Clipboard",
         "command": "diffMerge.compareFileWithClipboard"
+      },
+      {
+        "title": "[Diff & Merge] Select file to compare",
+        "command": "diffMerge.selectToCompare"
+      },
+      {
+        "title": "[Diff & Merge] Compare file with selected file",
+        "command": "diffMerge.compareWithSelected"
       }
     ]
   }

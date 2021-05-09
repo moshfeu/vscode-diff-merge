@@ -7,15 +7,6 @@ import { log } from './logger';
 import { isGit, isSvn } from './vc';
 import { patchToCodes } from './patch';
 
-const pathDescription: RegExp = /((.|\n|\r)*)@@\n/g;
-const pathNewline: RegExp = /\\ No newline at end of file[\n]*/gm;
-const lastEmptyLine: RegExp = /^\s*\z$/gm;
-const addedLine: RegExp = /^\+.*[\r\n]*/gm;
-const removedLine: RegExp = /^\-.*[\r\n]*/gm;
-const addedLineDiffSynmbol: RegExp = /^\+/gm;
-const removeLineDiffSynmbol: RegExp = /^-/gm;
-const diffIndentation: RegExp = /^ /gm;
-
 export function getExplorerSides(leftPath: string, rightPath: string) {
   const leftContent = getContentOrFallback(leftPath) || fileNotSupported;
   const rightContent = getContentOrFallback(rightPath) || fileNotSupported;
@@ -66,7 +57,7 @@ export function getGitSides(path: string) {
   return { leftContent, rightContent };
 }
 
-function getContentOrFallback(path: string) {
+export function getContentOrFallback(path: string) {
   const content = readFileSync(path);
   if (!istextorbinary.isTextSync(undefined, content)) {
     return '';
