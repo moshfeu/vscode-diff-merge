@@ -101,12 +101,12 @@
         },
         {
           "command": "diffMerge.nextDiff",
-          "group": "navigation@-100",
+          "group": "navigation@-99",
           "when": "diffMerge.panelFocused"
         },
         {
           "command": "diffMerge.prevDiff",
-          "group": "navigation@-99",
+          "group": "navigation@-100",
           "when": "diffMerge.panelFocused"
         }
       ],
@@ -163,7 +163,7 @@
         "command": "diffMerge.nextDiff",
         "icon": {
           "dark": "resources/icons/dark/down-arrow.svg",
-          "light": "resources/icons/light/down-arrow.svg"
+          "light": "resources/icons/light/arrow-down.svg"
         }
       },
       {
@@ -172,7 +172,7 @@
         "command": "diffMerge.prevDiff",
         "icon": {
           "dark": "resources/icons/dark/up-arrow.svg",
-          "light": "resources/icons/light/up-arrow.svg"
+          "light": "resources/icons/light/arrow-up.svg"
         }
       },
       {
