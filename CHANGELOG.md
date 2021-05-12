@@ -2,6 +2,10 @@
 
 All notable changes to the "compare-folders" extension will be documented in this file.
 
+## 0.5.0
+
+- feat: select + compare with selected - #40
+
 ## 0.4.0
 
 - feat: compare with clipboard - #25
