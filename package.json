@@ -43,6 +43,7 @@
     "test:unit": "ts-mocha src/**/*.spec.ts",
     "test": "node ./out/test/runTest.js",
     "package": "bash scripts/package.sh",
+    "deploy:openvsx": "yarn package && sh scripts/deploy-openvsx.sh",
     "deploy": "yarn package && vsce publish -p"
   },
   "devDependencies": {
