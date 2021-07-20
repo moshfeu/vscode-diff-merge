@@ -7,6 +7,10 @@ body {
   overflow: hidden;
 }
 
+body, .monaco-editor, .monaco-editor-background, .monaco-editor .inputarea.ime-input {
+  background-color: var(--vscode-editor-background) !important;
+}
+
 #container {
   height: 100%;
 }
