@@ -9,6 +9,7 @@ export function render(
   _diffEditor,
   { rightPath, notSupportedFile, leftContent, rightContent, theme, tabSize }
 ) {
+  setTheme(theme);
   diffEditor = _diffEditor;
   window.diffEditor = _diffEditor;
   diffEditor.setModel({
@@ -28,7 +29,6 @@ export function render(
   diffEditor.modifiedEditor.onDidChangeModelContent(onDidUpdateDiff);
   bindSaveShortcut();
   extractEditorStyles(diffEditor);
-  setTheme(theme);
   setTabSize(tabSize);
 }
 
@@ -256,8 +256,12 @@ function setTheme(theme) {
   if (!theme) {
     return;
   }
-  monaco.editor.defineTheme('vscodeTheme', theme);
-  monaco.editor.setTheme('vscodeTheme');
+  try {
+    monaco.editor.defineTheme('vscodeTheme', theme);
+    monaco.editor.setTheme('vscodeTheme');
+  } catch (e) {
+    console.log(e);
+  }
 }
 
 function retrieveCssVariables() {

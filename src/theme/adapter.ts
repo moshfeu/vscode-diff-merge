@@ -1,8 +1,13 @@
+const COMMENTED_LINE_REGEX = /^.*\/\/.*$\n/gm;
+const TRALING_COMMA_REGEX = /\,(?=\s*?[\}\]])/g;
+
+
 export function convertToMonacoTheme(text: string) {
   try {
     const vscodeTheme = JSON.parse(
       text
-        .replace(/\/\//gm, '')
+        .replace(COMMENTED_LINE_REGEX, '')
+        .replace(TRALING_COMMA_REGEX, '')
     );
 
     const rules = vscodeTheme.tokenColors.map((c: {scope: any, settings: any}) => ({
