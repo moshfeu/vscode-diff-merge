@@ -101,21 +101,28 @@ export function init(context: ExtensionContext) {
 
   let selectedFilePath: string;
   function selectToCompare(e: Uri) {
-    selectedFilePath = e.fsPath;
-    commands.executeCommand('setContext', 'diffMergeFileSelected', true);
+    try {
+      selectedFilePath = tryToGetPath(e);
+      commands.executeCommand('setContext', 'diffMergeFileSelected', true);
+    } catch (error) {
+      // ignore
+    }
   }
 
   async function compareWithSelected(e: Uri) {
     try {
+      const rightPath = tryToGetPath(e);
       if (!selectedFilePath) {
         log(
           `Somehow the user is able to "compare with selected without selecting a file first.\nSelected file path: ${selectedFilePath}`
         );
+        const whatHappened = await window.showErrorMessage(
+          'Have you selected a file to compare? ',
+          'I did, let me open an issue',
+          'I forgot'
+        )
         if (
-          (await window.showErrorMessage(
-            'Oops, if you see this message, please open an issue.',
-            'Open an issue'
-          )) === 'Open an issue'
+          (whatHappened) === 'I did, let me open an issue'
         ) {
           env.openExternal(
             Uri.parse('https://github.com/moshfeu/vscode-diff-merge/issues/new')
@@ -127,11 +134,22 @@ export function init(context: ExtensionContext) {
         context,
         leftContent: getContentOrFallback(selectedFilePath),
         leftPath: selectedFilePath,
-        rightPath: e.fsPath,
-        rightContent: getContentOrFallback(e.fsPath),
+        rightPath,
+        rightContent: getContentOrFallback(rightPath),
       });
     } catch (error) {
       log(`There is a problem to compare with selected: ${error}`);
     }
   }
+}
+
+function tryToGetPath(e: Uri) {
+  if (e) {
+    return e.fsPath;
+  }
+  if (window.activeTextEditor?.document.uri.fsPath) {
+    return window.activeTextEditor?.document.uri.fsPath;
+  }
+  window.showWarningMessage('No file selected');
+  throw new Error('No file selected');
 }
