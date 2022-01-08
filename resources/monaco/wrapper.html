@@ -26,6 +26,7 @@
     <option value="4">Multiplace actions</option>
   </select>
   <button onclick="swap()">Swap</button>
+  <button onclick="replaceAll()">Replace All</button>
   <iframe scrolling="no" id="wrapper" src="index.html"></iframe>
   <script>
     const qs = new URLSearchParams(location.search);
@@ -1246,6 +1247,12 @@ New content 🤪
     function swap() {
       iframe.contentWindow.postMessage({
         key: 'swap'
+      });
+    }
+
+    function replaceAll() {
+      iframe.contentWindow.postMessage({
+        key: 'replaceAll'
       });
     }
   </script>

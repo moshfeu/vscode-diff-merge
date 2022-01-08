@@ -53,6 +53,29 @@ export function swap() {
   setEditorValue(modifiedEditor, leftValue);
 }
 
+const asyncReplace = (/** @type {HTMLDivElement} */ action) => {
+  return new Promise((resolve) => {
+    action.click();
+    setTimeout(() => {
+      console.log(action);
+      resolve();
+    }, 250);
+  });
+}
+
+async function replaceNext() {
+  const action = document.querySelector('.diffAction');
+  if (!action) {
+    return;
+  }
+  await asyncReplace(action);
+  replaceNext();
+}
+
+export function replaceAll() {
+  replaceNext();
+}
+
 /**
  * @param {string} path
  * @param {string} qs
