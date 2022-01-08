@@ -148,7 +148,7 @@ function tryToGetPath(e: Uri) {
     return e.fsPath;
   }
   if (window.activeTextEditor?.document.uri.fsPath) {
-    return window.activeTextEditor?.document.uri.fsPath;
+    return window.activeTextEditor.document.uri.fsPath;
   }
   window.showWarningMessage('No file selected');
   throw new Error('No file selected');
