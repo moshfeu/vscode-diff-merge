@@ -42,6 +42,8 @@ steps:
 
 - bash: |
     echo ">>> Publish"
-    yarn deploy $(token)
+    yarn package
+    yarn deploy
+    yarn deploy:openvsx
   displayName: Publish
   condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'), eq(variables['Agent.OS'], 'Linux'))

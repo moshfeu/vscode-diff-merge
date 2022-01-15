@@ -101,16 +101,21 @@ Or
 
 ## Development
 
-1. `yarn`
-1. `yarn webview:watch`
+```
+yarn
+cd resources/monaco
+yarn
+cd ../../
+yarn webview:watch
+```
 
 Hit <kbd>F5</kbd>
 
 To run the diff view directly in the browser
 
 1. `yarn webview:watch`
-1. `yarn monaco` (in different terminal)
-1. Go to `http://localhost:12345/wrapper.html`
+2. `yarn monaco` (in different terminal)
+3. Go to `http://localhost:12345/wrapper.html`
 
 ## Credits
 
