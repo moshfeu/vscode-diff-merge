@@ -45,7 +45,7 @@
     "test": "node ./out/test/runTest.js",
     "package": "bash scripts/package.sh",
     "deploy:openvsx": "sh scripts/deploy-openvsx.sh",
-    "deploy": "vsce publish --yarn"
+    "deploy": "vsce publish -p $(VSCE_PAT)"
   },
   "devDependencies": {
     "@types/glob": "^7.1.1",
