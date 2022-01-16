@@ -5,19 +5,20 @@
 [![Visual Studio Marketplace](https://vsmarketplacebadge.apphb.com/installs-short/moshfeu.diff-merge.svg?style=flat-square)](https://marketplace.visualstudio.com/items?itemName=moshfeu.diff-merge)
 [![Follow me on Twitter](https://img.shields.io/twitter/follow/moshfeu.svg?style=social)](https://twitter.com/moshfeu)
 
-# Diff & Merge - Alpha version!
+# Diff & Merge!
 
-Show diffs and allow to merge from left side to right side.
+Show diffs and allow mergeing from left side to right side.
 
-✋ **This extension is in very early stage of development. Use on your own risk**
+✋ **This extension is maintained on my free time. I'm only fixing / developing features requested by the community.**
 
-<img width="1061" alt="Screen Shot 2019-12-04 at 20 18 22" src="https://user-images.githubusercontent.com/3723951/70169375-5b116a80-16d3-11ea-800e-99fd941a1bd8.png">
+🧙‍♂️ Notice that I (and seems that many others) couldn't find an easy way to implement such feature. Therefor, the user experience may not be perfect. The colors, fonts, icons, shortcuts and other UI elements may not be the same as vscode's.
+
+<img width="1061" alt="Screen Shot of the extension" src="https://user-images.githubusercontent.com/3723951/70169375-5b116a80-16d3-11ea-800e-99fd941a1bd8.png">
 
 👂**I would love to hear your feedback to improve this tool**
 
 Found a bug? Have an extra ordinary idea? Please create an [issue](https://github.com/moshfeu/vscode-diff-merge/issues/new)
 
-🧙‍♂️Notice that I (and seems that many others) couldn't find an easy way to implement such feature. Therefor, the user experience may not be perfect. The colors, fonts, icons, shortcuts and cetera may not be the same as vscode's. I'll do our best to match the experienc though.
 
 ## Features
 
@@ -74,7 +75,7 @@ Or
 
 1. Open commmand palette (<kbd>Command / Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd>)
 1. Search for `[Diff & Merge] Blank diff view`
-1. An empty diff view will opened. Paste a code in both of sides and compare
+2. An empty diff view will opened. Paste a code in both sides and compare
 
 <hr />
 <sup>[1]</sup> - Make sure that the file is text based (not images, binaries, pdfs etc.)
