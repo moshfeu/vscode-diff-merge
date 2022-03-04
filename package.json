@@ -2,7 +2,7 @@
   "name": "diff-merge",
   "displayName": "Diff & Merge",
   "description": "Show diffs and merge",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "license": "MIT",
   "repository": {
     "type": "git",
