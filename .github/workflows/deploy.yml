@@ -11,8 +11,8 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: 16
-      - name: Build
-        run: yarn package
+      - run: yarn
+      - run: yarn package
       - name: Publish to Open VSX Registry
         uses: HaaLeo/publish-vscode-extension@v1
         with:

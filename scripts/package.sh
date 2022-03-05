@@ -16,9 +16,3 @@ yarn build
 if [ $? -ne 0 ] ; then
   exit 125
 fi
-cd ../..
-echo "<<vsce package>>"
-vsce package
-if [ $? -ne 0 ] ; then
-  exit 125
-fi
