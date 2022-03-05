@@ -16,9 +16,10 @@ yarn build
 if [ $? -ne 0 ] ; then
   exit 125
 fi
-cd ../..
-echo "<<vsce package>>"
-yarn run vsce package
-if [ $? -ne 0 ] ; then
-  exit 125
-fi
+# No need. publish-vscode-extension does it.
+# cd ../..
+# echo "<<vsce package>>"
+# yarn run vsce package
+# if [ $? -ne 0 ] ; then
+#   exit 125
+# fi
