@@ -1,17 +1,16 @@
 trigger:
   branches:
-    include: ['*']
-  tags:
-    include: ['*']
+    include:
+      - master
 
 strategy:
   matrix:
     linux:
       imageName: 'ubuntu-latest'
     mac:
-      imageName: 'macOS-10.15'
+      imageName: 'macos-latest'
     windows:
-      imageName: 'vs2017-win2016'
+      imageName: 'windows-latest'
 
 pool:
   vmImage: $(imageName)
@@ -19,7 +18,7 @@ pool:
 steps:
   - task: NodeTool@0
     inputs:
-      versionSpec: '12.x'
+      versionSpec: '10.x'
     displayName: 'Install Node.js'
 
   - bash: |
@@ -38,13 +37,3 @@ steps:
     displayName: Run Tests
     env:
       DISPLAY: ':99.0'
-
-  - bash: |
-      echo ">>> Publish"
-      yarn package
-      yarn deploy
-    displayName: Publish
-    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'), eq(variables['Agent.OS'], 'Linux'))
-    env:
-      VSCE_PAT: $(VSCE_PAT)
-      OPEN_VSX: $(OPEN_VSX)
