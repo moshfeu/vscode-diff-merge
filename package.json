@@ -225,7 +225,10 @@
       {
         "title": "[Diff & Merge] Open current diff-view with Diff & Merge",
         "command": "diffMerge.openWithDiffMerge",
-        "icon": "$(symbol-boolean)"
+        "icon": {
+          "dark": "resources/icons/dark/diff-merge-icon.svg",
+          "light": "resources/icons/light/diff-merge-icon.svg"
+        }
       }
     ]
   }
