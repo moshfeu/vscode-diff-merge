@@ -41,14 +41,17 @@ export function init(context: ExtensionContext) {
     const editorIndexInDiffEditors = diffEditors.indexOf(editor);
     // Get the editors content.
     const leftEditorIndex = Math.trunc(editorIndexInDiffEditors / 2) * 2;
-    const rightEditorIndex = leftEditorIndex + 1;
-    const leftEditor = diffEditors[leftEditorIndex];
-    const leftContent = leftEditor.document.getText();
-    const leftPath = leftEditor.document.uri.fsPath;
-    const rightEditor = diffEditors[rightEditorIndex];
-    const rightContent = rightEditor.document.getText();
-    const rightPath = rightEditor.document.uri.fsPath;
-    showDiff({ leftContent, rightContent, leftPath, rightPath, context });
+    const [leftEditor, rightEditor] = diffEditors.slice(leftEditorIndex, leftEditorIndex + 2);
+    if (leftEditor.document.uri.scheme === 'git') {
+      return gitDiff({ resourceUri: leftEditor.document.uri });
+    }
+    else {
+      const leftContent = leftEditor.document.getText();
+      const leftPath = leftEditor.document.uri.fsPath;
+      const rightContent = rightEditor.document.getText();
+      const rightPath = rightEditor.document.uri.fsPath;
+      return showDiff({ leftContent, rightContent, leftPath, rightPath, context });
+    }
   }
 
   async function compareFileWithClipboard() {
