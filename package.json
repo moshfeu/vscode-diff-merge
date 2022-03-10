@@ -171,28 +171,19 @@
         "title": "Next Change",
         "category": "Diff Merge",
         "command": "diffMerge.nextDiff",
-        "icon": {
-          "dark": "resources/icons/dark/down-arrow.svg",
-          "light": "resources/icons/light/arrow-down.svg"
-        }
+        "icon": "$(diff-editor-next-change)"
       },
       {
         "title": "Previous Change",
         "category": "Diff Merge",
         "command": "diffMerge.prevDiff",
-        "icon": {
-          "dark": "resources/icons/dark/up-arrow.svg",
-          "light": "resources/icons/light/arrow-up.svg"
-        }
+        "icon": "$(diff-editor-previous-change)"
       },
       {
         "title": "Swap sides",
         "category": "Diff Merge",
         "command": "diffMerge.swap",
-        "icon": {
-          "dark": "resources/icons/dark/swap.svg",
-          "light": "resources/icons/light/swap.svg"
-        }
+        "icon": "$(arrow-both)"
       },
       {
         "title": "[Diff & Merge] Choose a file to merge",
