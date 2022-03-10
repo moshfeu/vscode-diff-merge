@@ -1,37 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Monaco</title>
-  <style>
-    body {
-      margin: 0;
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Monaco</title>
+    <style>
+      body {
+        margin: 0;
+      }
 
-    iframe {
-      border: none;
-      width: 100vw;
-      height: 100vh;
-    }
-  </style>
-</head>
-<body>
-  <select>
-    <option value="0">Add</option>
-    <option value="1">Remove</option>
-    <option value="2">Replace</option>
-    <option value="3">Replace multiline</option>
-    <option value="4">Multiplace actions</option>
-  </select>
-  <button onclick="swap()">Swap</button>
-  <iframe scrolling="no" id="wrapper" src="index.html"></iframe>
-  <script>
-    const qs = new URLSearchParams(location.search);
-    const diffs = [
-      {
-        rightContent: `<?php
+      iframe {
+        border: none;
+        width: 100vw;
+        height: 100vh;
+      }
+    </style>
+  </head>
+  <body>
+    <select>
+      <option value="0">Add</option>
+      <option value="1">Remove</option>
+      <option value="2">Replace</option>
+      <option value="3">Replace multiline</option>
+      <option value="4">Multiplace actions</option>
+    </select>
+    <button onclick="swap()">Swap</button>
+    <iframe scrolling="no" id="wrapper" src="playground.html"></iframe>
+    <script>
+      const qs = new URLSearchParams(location.search);
+      const diffs = [
+        {
+          rightContent: `<?php
 
 class Image
 {
@@ -468,7 +468,7 @@ class Image
 }
 
 ?>`,
-        leftContent: `<?php
+          leftContent: `<?php
 
 class Image
 {
@@ -1150,49 +1150,49 @@ class Image
 
 }
 
-?>`
-      },
-      {
-        rightContent: `<body>
+?>`,
+        },
+        {
+          rightContent: `<body>
   Lorem Ispum
 </body>`,
-        leftContent: `<body>
-  Lorem Ispum
-  <div>
-    Old content
-  </div>
-</body>`
-      },
-      {
-        rightContent: `<body>
+          leftContent: `<body>
   Lorem Ispum
   <div>
     Old content
   </div>
 </body>`,
-        leftContent: `<body>
+        },
+        {
+          rightContent: `<body>
   Lorem Ispum
-</body>`
-      },
-      {
-        rightContent: `<body>
+  <div>
+    Old content
+  </div>
+</body>`,
+          leftContent: `<body>
+  Lorem Ispum
+</body>`,
+        },
+        {
+          rightContent: `<body>
   Lorem Ispum1
 </body>`,
-        leftContent: `<body>
+          leftContent: `<body>
   Lorem Ispum
-</body>`
-      },
-      {
-        rightContent: `<body>
+</body>`,
+        },
+        {
+          rightContent: `<body>
   Lorem Ispum1
   Lorem Ispum1
 </body>`,
-        leftContent: `<body>
+          leftContent: `<body>
   Lorem Ispum
-</body>`
-      },
-      {
-        leftContent: `<!DOCTYPE html>
+</body>`,
+        },
+        {
+          leftContent: `<!DOCTYPE html>
 <html>
 <body>
 
@@ -1202,7 +1202,7 @@ class Image
 <div></div>
 </body>
 </html>`,
-        rightContent: `<!DOCTYPE html>
+          rightContent: `<!DOCTYPE html>
 <html>
 <body>
 
@@ -1212,42 +1212,43 @@ class Image
 <div></div>
 New content 🤪
 </body>
-</html>`}
-    ];
+</html>`,
+        },
+      ];
 
-    const fileNotSupported = 'asdf';
-    const iframe = document.querySelector('#wrapper');
-    window.addEventListener('message', e => {
-      if (e.data.command === 'load') {
-        setDiff(qs.get('opt') || 0);
-      }
-    });
-
-    const select = document.querySelector('select');
-    select.addEventListener('change', e => {
-      location.search = `opt=${e.target.value}`;
-    });
-
-    function setDiff(index) {
-      select.value = index;
-      const {leftContent, rightContent} = diffs[index];
-      iframe.contentWindow.postMessage({
-        key: 'data',
-        payload: {
-          rightPath: '/index.html',
-          leftContent,
-          rightContent,
-          fileNotSupported,
-          tabSize: 20
+      const fileNotSupported = 'asdf';
+      const iframe = document.querySelector('#wrapper');
+      window.addEventListener('message', (e) => {
+        if (e.data.command === 'load') {
+          setDiff(qs.get('opt') || 0);
         }
-      })
-    }
-
-    function swap() {
-      iframe.contentWindow.postMessage({
-        key: 'swap'
       });
-    }
-  </script>
-</body>
+
+      const select = document.querySelector('select');
+      select.addEventListener('change', (e) => {
+        location.search = `opt=${e.target.value}`;
+      });
+
+      function setDiff(index) {
+        select.value = index;
+        const { leftContent, rightContent } = diffs[index];
+        iframe.contentWindow.postMessage({
+          key: 'data',
+          payload: {
+            rightPath: '/index.html',
+            leftContent,
+            rightContent,
+            fileNotSupported,
+            tabSize: 20,
+          },
+        });
+      }
+
+      function swap() {
+        iframe.contentWindow.postMessage({
+          key: 'swap',
+        });
+      }
+    </script>
+  </body>
 </html>

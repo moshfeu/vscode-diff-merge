@@ -3,5 +3,8 @@
     "checkJs": true,
     "target": "es2015",
   },
+  "files": [
+    "index.d.ts"
+  ],
   "exclude": ["node_modules"]
 }
