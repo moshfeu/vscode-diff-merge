@@ -1,7 +1,11 @@
+//// @ts-check
 /// <reference path="../node_modules/monaco-editor/monaco.d.ts" />
 
 let cacheActionsLines = [];
 let diffActionsNode,
+  /**
+   * @type {monaco.editor.IDiffEditor}
+   */
   diffEditor,
   ignoreChange = false;
 
@@ -26,10 +30,11 @@ export function render(
   });
   diffActionsNode = createDiffActionsContainer(diffEditor);
   window.diffNavigator = monaco.editor.createDiffNavigator(diffEditor);
-  diffEditor.modifiedEditor.onDidChangeModelContent(onDidUpdateDiff);
+  diffEditor.getModifiedEditor().onDidChangeModelContent(onDidUpdateDiff);
   bindSaveShortcut();
   extractEditorStyles(diffEditor);
   setTabSize(tabSize);
+  listenToDiffEditorResize(diffEditor.getModifiedEditor().getDomNode());
 }
 
 function setTabSize(tabSize) {
@@ -107,9 +112,9 @@ function getStrategy(change) {
   const isChangeInModifiedSide = change.originalEndLineNumber === 0;
   if (isChangeInModifiedSide) {
     return {
-      top: diffEditor.modifiedEditor.getTopForLineNumber(
-        change.modifiedStartLineNumber
-      ),
+      top: diffEditor
+        .getModifiedEditor()
+        .getTopForLineNumber(change.modifiedStartLineNumber),
       replacer: () => {
         const startLine = change.modifiedStartLineNumber - 1;
         return {
@@ -153,7 +158,7 @@ function applyOriginalLines(originalLines, replacer, diffEditor) {
     range: new monaco.Range(++startLine, 0, startLine + linesToRemove, 0),
     text: originalLines,
   };
-  diffEditor.modifiedEditor.executeEdits('diff-merge', [diff]);
+  diffEditor.getModifiedEditor().executeEdits('diff-merge', [diff]);
 }
 
 export function getChangeOriginalValue(change, diffEditor) {
@@ -184,7 +189,7 @@ function createOrUpdateDiffAction(diffActionsNode, top, onCopy) {
 }
 
 export function layoutDiffContainer(diffActions = diffActionsNode) {
-  const modifedEditorNode = diffEditor.modifiedEditor.getDomNode();
+  const modifedEditorNode = diffEditor.getModifiedEditor().getDomNode();
   diffActions.style.left = `${
     modifedEditorNode.getBoundingClientRect().left
   }px`;
@@ -196,7 +201,7 @@ function createDiffActionsContainer(diffEditor) {
   diffActions.style.height = `${diffEditor.originalEditor.getScrollHeight()}px`;
   document.querySelector('#container').appendChild(diffActions);
 
-  diffEditor.modifiedEditor.onDidScrollChange(({ scrollTop }) => {
+  diffEditor.getModifiedEditor().onDidScrollChange(({ scrollTop }) => {
     diffActions.style.top = `-${scrollTop}px`;
   });
   layoutDiffContainer(diffActions);
@@ -236,7 +241,7 @@ function bindSaveShortcut() {
           command: 'save',
           contents: {
             left: diffEditor.originalEditor.getValue(),
-            right: diffEditor.modifiedEditor.getValue(),
+            right: diffEditor.getModifiedEditor().getValue(),
           },
         });
       }
@@ -246,9 +251,9 @@ function bindSaveShortcut() {
 }
 
 function extractEditorStyles(diffEditor) {
-  const lineHeight = diffEditor.modifiedEditor.getOption(
-    monaco.editor.EditorOption.lineHeight
-  );
+  const lineHeight = diffEditor
+    .getModifiedEditor()
+    .getOption(monaco.editor.EditorOption.lineHeight);
   document.body.style.setProperty('--diff-merge-lineheight', `${lineHeight}px`);
 }
 
@@ -276,4 +281,20 @@ function retrieveCssVariables() {
       ol[htmlTag.style[ne]] = compotedStyle.getPropertyValue(htmlTag.style[ne]);
       return ol;
     }, {});
+}
+/**
+ * @param  {HTMLElement} modifiedEditorNode
+ */
+function listenToDiffEditorResize(modifiedEditorNode) {
+  const observer = new MutationObserver(function (mutations) {
+    mutations.forEach(function (mutation) {
+      if (mutation.attributeName === 'style') {
+        layoutDiffContainer();
+      }
+    });
+  });
+
+  observer.observe(modifiedEditorNode, {
+    attributes: true,
+  });
 }
