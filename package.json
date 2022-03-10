@@ -109,6 +109,11 @@
           "command": "diffMerge.prevDiff",
           "group": "navigation@-100",
           "when": "diffMerge.panelFocused"
+        },
+        {
+          "command": "diffMerge.openWithDiffMerge",
+          "group": "navigation@-98",
+          "when": "!diffMerge.panelFocused && inDiffEditor"
         }
       ],
       "editor/title/context": [
@@ -142,6 +147,10 @@
         {
           "command": "diffMerge.prevDiff",
           "when": "diffMerge.panelFocused"
+        },
+        {
+          "command": "diffMerge.openWithDiffMerge",
+          "when": "!diffMerge.panelFocused && inDiffEditor"
         }
       ]
     },
@@ -212,6 +221,14 @@
       {
         "title": "[Diff & Merge] Compare file with selected file",
         "command": "diffMerge.compareWithSelected"
+      },
+      {
+        "title": "[Diff & Merge] Open current diff-view with Diff & Merge",
+        "command": "diffMerge.openWithDiffMerge",
+        "icon": {
+          "dark": "resources/icons/dark/diff-merge-icon.svg",
+          "light": "resources/icons/light/diff-merge-icon.svg"
+        }
       }
     ]
   }

@@ -2,8 +2,9 @@ import { getFilePath } from './path';
 import { showDiff, showNotSupported } from './webview';
 import { getGitSides, getExplorerSides, getContentOrFallback } from './content';
 import { getActiveDiffPanelWebview } from './webview/store';
-import { commands, window, Uri, ExtensionContext, env } from 'vscode';
+import { commands, window, Uri, ExtensionContext, env, TextEditor } from 'vscode';
 import { log } from './logger';
+import { takeWhile, takeRightWhile } from 'lodash';
 
 export function init(context: ExtensionContext) {
   context.subscriptions.push(
@@ -22,8 +23,36 @@ export function init(context: ExtensionContext) {
     commands.registerCommand(
       'diffMerge.compareFileWithClipboard',
       compareFileWithClipboard
-    )
+    ),
+    commands.registerCommand('diffMerge.openWithDiffMerge', reopenCurrentWithDiffMerge),
   );
+
+  async function reopenCurrentWithDiffMerge() {
+    const editor = window.activeTextEditor;
+    if (!editor) return;
+    const visibleEditors = window.visibleTextEditors;
+    const editorIndex = visibleEditors.indexOf(editor);
+    // This might not be always true. But it's the only way I can think of how to know whether it's a diff-editor.
+    const isDiffEditor = (editor: TextEditor) => editor.viewColumn === undefined && ['git', 'file'].includes(editor.document.uri.scheme);
+    // In case multiple diff-editors are open, we need to find the correct one.
+    const diffEditors =
+      takeRightWhile(visibleEditors.slice(undefined, editorIndex + 1), isDiffEditor)
+        .concat(takeWhile(visibleEditors.slice(editorIndex + 1), isDiffEditor));
+    const editorIndexInDiffEditors = diffEditors.indexOf(editor);
+    // Get the editors content.
+    const leftEditorIndex = Math.trunc(editorIndexInDiffEditors / 2) * 2;
+    const [leftEditor, rightEditor] = diffEditors.slice(leftEditorIndex, leftEditorIndex + 2);
+    if (leftEditor.document.uri.scheme === 'git') {
+      return gitDiff({ resourceUri: leftEditor.document.uri });
+    }
+    else {
+      const leftContent = leftEditor.document.getText();
+      const leftPath = leftEditor.document.uri.fsPath;
+      const rightContent = rightEditor.document.getText();
+      const rightPath = rightEditor.document.uri.fsPath;
+      return showDiff({ leftContent, rightContent, leftPath, rightPath, context });
+    }
+  }
 
   async function compareFileWithClipboard() {
     const { document } = window.activeTextEditor || {};
