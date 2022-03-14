@@ -14,7 +14,7 @@ export function getExplorerSides(leftPath: string, rightPath: string) {
   return { leftContent, rightContent };
 }
 
-export function getGitSides(path: string) {
+export function getGitSides(path: string, { ref }: { ref?: string } = {}) {
   const rootPath = getRootPath();
   let leftContent = '';
   let rightContent;
@@ -28,9 +28,12 @@ export function getGitSides(path: string) {
         .split(/\n/g)
         .includes(path);
 
-      const cmdGitDiff = `git diff -U100000 ${
-        isStaged ? '--cached' : ''
-      } -- ${path}`;
+      const cmdGitDiff = (
+        'git diff -U100000'
+        + (isStaged ? ' --cached' : '')
+        + (ref ? ` ${ref}` : '')
+        + ` -- ${path}`
+      );
       log(cmdGitDiff);
       patch = execSync(cmdGitDiff, cwdCommandOptions);
     } else if (isSvn()) {

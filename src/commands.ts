@@ -33,7 +33,8 @@ export function init(context: ExtensionContext) {
     const visibleEditors = window.visibleTextEditors;
     const editorIndex = visibleEditors.indexOf(editor);
     // This might not be always true. But it's the only way I can think of how to know whether it's a diff-editor.
-    const isDiffEditor = (editor: TextEditor) => editor.viewColumn === undefined && ['git', 'file'].includes(editor.document.uri.scheme);
+    const supportedSchemes = ['file', 'git', 'gitlens', 'git-graph'];
+    const isDiffEditor = (editor: TextEditor) => editor.viewColumn === undefined && supportedSchemes.includes(editor.document.uri.scheme);
     // In case multiple diff-editors are open, we need to find the correct one.
     const diffEditors =
       takeRightWhile(visibleEditors.slice(undefined, editorIndex + 1), isDiffEditor)
@@ -44,6 +45,17 @@ export function init(context: ExtensionContext) {
     const [leftEditor, rightEditor] = diffEditors.slice(leftEditorIndex, leftEditorIndex + 2);
     if (leftEditor.document.uri.scheme === 'git') {
       return gitDiff({ resourceUri: leftEditor.document.uri });
+    }
+    if (leftEditor.document.uri.scheme === 'gitlens') {
+      const gitlensInfo = JSON.parse(leftEditor.document.uri.query) as { ref: string };
+      return gitDiff({ resourceUri: leftEditor.document.uri, ref: gitlensInfo.ref });
+    }
+    if (leftEditor.document.uri.scheme === 'git-graph') {
+      const gitGraphInfoBase64 = leftEditor.document.uri.query;
+      type GitGraphInfo = { commit: string, repo: string, filePath: string };
+      const gitGraphInfo = JSON.parse(Buffer.from(gitGraphInfoBase64, 'base64').toString()) as GitGraphInfo;
+      const path = Uri.joinPath(Uri.file(gitGraphInfo.repo), gitGraphInfo.filePath);
+      return gitDiff({ resourceUri: path, ref: gitGraphInfo.commit });
     }
     else {
       const leftContent = leftEditor.document.getText();
@@ -76,10 +88,10 @@ export function init(context: ExtensionContext) {
     showDiff({ leftContent: '', rightContent: '', rightPath: '', context });
   }
 
-  function gitDiff(e: { resourceUri: Uri }) {
+  function gitDiff(e: { resourceUri: Uri, ref?: string }) {
     try {
       const rightPath = getFilePath(e.resourceUri.fsPath);
-      const { leftContent, rightContent } = getGitSides(rightPath);
+      const { leftContent, rightContent } = getGitSides(rightPath, { ref: e.ref });
       if (rightContent || leftContent) {
         showDiff({ leftContent, rightContent, rightPath, context });
       } else {
