@@ -2,7 +2,7 @@
   "name": "diff-merge",
   "displayName": "Diff & Merge",
   "description": "Show diffs and merge",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -31,7 +31,7 @@
     "Other"
   ],
   "activationEvents": [
-    "*"
+    "onStartupFinished"
   ],
   "main": "./out/extension.js",
   "scripts": {
@@ -51,7 +51,7 @@
     "@types/glob": "^7.1.1",
     "@types/istextorbinary": "^2.3.0",
     "@types/lodash": "^4.14.140",
-    "@types/mocha": "^5.2.6",
+    "@types/mocha": "^9.1.0",
     "@types/node": "^10.12.21",
     "@types/vscode": "^1.38.0",
     "glob": "^7.1.4",
@@ -63,7 +63,8 @@
     "vscode-test": "^1.0.2"
   },
   "dependencies": {
-    "istextorbinary": "^3.0.0"
+    "istextorbinary": "^3.0.0",
+    "lodash": "^4.17.21"
   },
   "contributes": {
     "menus": {
