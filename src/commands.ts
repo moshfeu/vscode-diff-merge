@@ -132,9 +132,10 @@ export function init(context: ExtensionContext) {
   function selectToCompare(e: Uri) {
     try {
       selectedFilePath = tryToGetPath(e);
+      log(`file selected: ${selectedFilePath || 'no file selected'}`);
       commands.executeCommand('setContext', 'diffMergeFileSelected', true);
     } catch (error) {
-      // ignore
+      log(error as object)
     }
   }
 
