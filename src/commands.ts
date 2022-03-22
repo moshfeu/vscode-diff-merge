@@ -5,6 +5,7 @@ import { getActiveDiffPanelWebview } from './webview/store';
 import { commands, window, Uri, ExtensionContext, env, TextEditor } from 'vscode';
 import { log } from './logger';
 import { takeWhile, takeRightWhile } from 'lodash';
+import { isSupportedExtension, uriToGitInfo } from './externalExtensionsSupport';
 
 export function init(context: ExtensionContext) {
   context.subscriptions.push(
@@ -33,8 +34,9 @@ export function init(context: ExtensionContext) {
     const visibleEditors = window.visibleTextEditors;
     const editorIndex = visibleEditors.indexOf(editor);
     // This might not be always true. But it's the only way I can think of how to know whether it's a diff-editor.
-    const supportedSchemes = ['file', 'git', 'gitlens', 'git-graph'];
-    const isDiffEditor = (editor: TextEditor) => editor.viewColumn === undefined && supportedSchemes.includes(editor.document.uri.scheme);
+    const supportedBuiltInSchemes = ['file', 'git'];
+    const isSupportedSchema = (schema: string) => supportedBuiltInSchemes.includes(schema) || isSupportedExtension(schema);
+    const isDiffEditor = (editor: TextEditor) => editor.viewColumn === undefined && isSupportedSchema(editor.document.uri.scheme);
     // In case multiple diff-editors are open, we need to find the correct one.
     const diffEditors =
       takeRightWhile(visibleEditors.slice(undefined, editorIndex + 1), isDiffEditor)
@@ -43,19 +45,11 @@ export function init(context: ExtensionContext) {
     // Get the editors content.
     const leftEditorIndex = Math.trunc(editorIndexInDiffEditors / 2) * 2;
     const [leftEditor, rightEditor] = diffEditors.slice(leftEditorIndex, leftEditorIndex + 2);
-    if (leftEditor.document.uri.scheme === 'git') {
+    if (isSupportedExtension(leftEditor.document.uri.scheme)) {
+      return gitDiff(uriToGitInfo(leftEditor.document.uri.scheme, leftEditor.document.uri));
+    }
+    else if (leftEditor.document.uri.scheme === 'git') {
       return gitDiff({ resourceUri: leftEditor.document.uri });
-    }
-    if (leftEditor.document.uri.scheme === 'gitlens') {
-      const gitlensInfo = JSON.parse(leftEditor.document.uri.query) as { ref: string };
-      return gitDiff({ resourceUri: leftEditor.document.uri, ref: gitlensInfo.ref });
-    }
-    if (leftEditor.document.uri.scheme === 'git-graph') {
-      const gitGraphInfoBase64 = leftEditor.document.uri.query;
-      type GitGraphInfo = { commit: string, repo: string, filePath: string };
-      const gitGraphInfo = JSON.parse(Buffer.from(gitGraphInfoBase64, 'base64').toString()) as GitGraphInfo;
-      const path = Uri.joinPath(Uri.file(gitGraphInfo.repo), gitGraphInfo.filePath);
-      return gitDiff({ resourceUri: path, ref: gitGraphInfo.commit });
     }
     else {
       const leftContent = leftEditor.document.getText();
