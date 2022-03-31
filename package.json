@@ -112,6 +112,11 @@
           "when": "diffMerge.panelFocused"
         },
         {
+          "command": "diffMerge.applyAllChanges",
+          "group": "navigation@-102",
+          "when": "diffMerge.panelFocused && diffMerge.hasChanges"
+        },
+        {
           "command": "diffMerge.openWithDiffMerge",
           "group": "navigation@-98",
           "when": "!diffMerge.panelFocused && inDiffEditor"
@@ -179,6 +184,12 @@
         "category": "Diff Merge",
         "command": "diffMerge.prevDiff",
         "icon": "$(diff-editor-previous-change)"
+      },
+      {
+        "title": "Apply All Changes",
+        "category": "Diff Merge",
+        "command": "diffMerge.applyAllChanges",
+        "icon": "$(check-all)"
       },
       {
         "title": "Swap sides",

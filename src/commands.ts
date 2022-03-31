@@ -25,6 +25,7 @@ export function init(context: ExtensionContext) {
       compareFileWithClipboard
     ),
     commands.registerCommand('diffMerge.openWithDiffMerge', reopenCurrentWithDiffMerge),
+    commands.registerCommand('diffMerge.applyAllChanges', applyAllChanges)
   );
 
   async function reopenCurrentWithDiffMerge() {
@@ -170,6 +171,11 @@ export function init(context: ExtensionContext) {
     } catch (error) {
       log(`There is a problem to compare with selected: ${error}`);
     }
+  }
+
+  function applyAllChanges() {
+    const webview = getActiveDiffPanelWebview();
+    webview.api.sendApplyAllChanges();
   }
 }
 
