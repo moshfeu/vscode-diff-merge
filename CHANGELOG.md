@@ -2,6 +2,18 @@
 
 All notable changes to the "compare-folders" extension will be documented in this file.
 
+## 0.7.0
+
+* build(deps): bump minimist from 1.2.5 to 1.2.6 by @dependabot in https://github.com/moshfeu/vscode-diff-merge/pull/88
+* build(deps): bump minimist from 1.2.5 to 1.2.6 in /resources/monaco by @dependabot in https://github.com/moshfeu/vscode-diff-merge/pull/87
+* feat: apply all changes by @moshfeu in https://github.com/moshfeu/vscode-diff-merge/pull/89
+* build(deps): bump ansi-regex from 3.0.0 to 3.0.1 by @dependabot in https://github.com/moshfeu/vscode-diff-merge/pull/92
+* build(deps): bump ansi-regex from 3.0.0 to 3.0.1 in /resources/monaco by @dependabot in https://github.com/moshfeu/vscode-diff-merge/pull/93
+* fix: consider font styles by @moshfeu in https://github.com/moshfeu/vscode-diff-merge/pull/94
+
+
+**Full Changelog**: https://github.com/moshfeu/vscode-diff-merge/compare/v0.6.1...v0.7.0
+
 ## 0.6.0
 
 * fix(select-to-compare): silent exception when selecting from command palette by @moshfeu in https://github.com/moshfeu/vscode-diff-merge/pull/64
