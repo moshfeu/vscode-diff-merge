@@ -1,4 +1,4 @@
-import { commands, window, Selection, Range, Position } from 'vscode';
+import { commands, window, Range, Position } from 'vscode';
 import { convertToMonacoTheme } from './adapter';
 import { log } from '../logger';
 

@@ -34,7 +34,7 @@ export async function showDiff({ leftContent, rightContent, leftPath, rightPath,
     );
 
     const theme = await extract();
-    const { tabSize } = workspace.getConfiguration('editor');
+    const { tabSize, fontFamily, fontSize } = workspace.getConfiguration('editor');
 
     const webviewEnv: ExtendedWebviewEnv = {
       leftPath,
@@ -43,7 +43,11 @@ export async function showDiff({ leftContent, rightContent, leftPath, rightPath,
       rightContent,
       fileNotSupported,
       theme,
-      tabSize
+      styles: {
+        tabSize,
+        fontFamily,
+        fontSize,
+      }
     };
 
     const extendsWebView = new ExtendedWebview(

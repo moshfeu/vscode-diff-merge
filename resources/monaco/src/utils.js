@@ -11,7 +11,7 @@ let diffActionsNode,
 
 export function render(
   _diffEditor,
-  { rightPath, notSupportedFile, leftContent, rightContent, theme, tabSize }
+  { rightPath, notSupportedFile, leftContent, rightContent, theme, styles: {tabSize, fontSize, fontFamily} }
 ) {
   setTheme(theme);
   diffEditor = _diffEditor;
@@ -33,16 +33,18 @@ export function render(
   diffEditor.getModifiedEditor().onDidChangeModelContent(onDidUpdateDiff);
   bindSaveShortcut();
   extractEditorStyles(diffEditor);
-  setTabSize(tabSize);
+  setEditorStyles({tabSize, fontSize, fontFamily});
   listenToDiffEditorResize(diffEditor.getModifiedEditor().getDomNode());
 }
 
-function setTabSize(tabSize) {
+function setEditorStyles({tabSize, fontSize, fontFamily}) {
   const { originalEditor, modifiedEditor } = diffEditor;
-  const updateTabSize = (model) =>
-    model.updateOptions({ tabSize, detectIndentation: false });
-  updateTabSize(originalEditor.getModel());
-  updateTabSize(modifiedEditor.getModel());
+  const updateTabSize = (editor) => {
+    editor.updateOptions({ fontSize, fontFamily});
+    editor.getModel().updateOptions({ tabSize, detectIndentation: false });
+  }
+  updateTabSize(originalEditor);
+  updateTabSize(modifiedEditor);
 }
 
 function setEditorValue(editor, value) {
