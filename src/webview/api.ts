@@ -37,4 +37,10 @@ export class API {
       key: 'swap'
     });
   }
+
+  sendApplyAllChanges() {
+    this.send({
+      key: 'applyAllChanges'
+    });
+  }
 }

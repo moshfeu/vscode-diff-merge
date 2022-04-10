@@ -5,6 +5,7 @@ import { readFileSync } from 'fs';
 import { utf8Stream, UNSAVED_SYMBOL } from '../constants';
 import { ExtensionContext, Uri, WebviewPanel } from 'vscode';
 import { getTitle } from './utils';
+import { setHasChanges } from '../context';
 
 interface IExtendedWebviewEnvContentOnly {
   content: string;
@@ -126,7 +127,7 @@ export class ExtendedWebview {
     const { webview } = this.webViewPanel;
 
     webview.html = this.getTemplate();
-    webview.onDidReceiveMessage(async (e: IpcEvent) => {
+    webview.onDidReceiveMessage(async (e: DiffViewEvent) => {
       switch (e.command) {
         case 'load':
           this.api.sendPayload(this.params);
@@ -136,6 +137,9 @@ export class ExtendedWebview {
           break;
         case 'save':
           this.onSave(e as SaveEvent);
+          break;
+        case 'diffApplied':
+          setHasChanges((e as DiffAppliedEvent).count > 0);
           break;
         default:
           if (this._listener) {

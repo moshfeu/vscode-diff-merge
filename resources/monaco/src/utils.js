@@ -104,6 +104,10 @@ export function addDiffActions(diffEditor) {
       }
     });
     cacheActionsLines = actionsLines;
+    vscode.postMessage({
+      command: 'diffApplied',
+      count: changes.length,
+    });
   });
 }
 
@@ -231,19 +235,23 @@ function isSaveShortcut(e) {
   );
 }
 
+function save() {
+  vscode.postMessage({
+    command: 'save',
+    contents: {
+      left: diffEditor.originalEditor.getValue(),
+      right: diffEditor.getModifiedEditor().getValue(),
+    },
+  });
+}
+
 function bindSaveShortcut() {
   document.addEventListener(
     'keydown',
     (e) => {
       if (isSaveShortcut(e)) {
         e.preventDefault();
-        vscode.postMessage({
-          command: 'save',
-          contents: {
-            left: diffEditor.originalEditor.getValue(),
-            right: diffEditor.getModifiedEditor().getValue(),
-          },
-        });
+        save();
       }
     },
     false
@@ -297,4 +305,16 @@ function listenToDiffEditorResize(modifiedEditorNode) {
   observer.observe(modifiedEditorNode, {
     attributes: true,
   });
+}
+
+export function applyAllChanges() {
+  const modifiedEditor = diffEditor.getModifiedEditor();
+  const modifiedModel = modifiedEditor.getModel();
+  const modifiedLastLineNumber = modifiedModel.getLineCount();
+  const originalContent = diffEditor.getOriginalEditor().getValue();
+  const diff = {
+    range: new monaco.Range(0, 0, modifiedLastLineNumber, modifiedModel.getLineLength(modifiedLastLineNumber) + 1),
+    text: originalContent,
+  };
+  modifiedEditor.executeEdits('diff-merge', [diff]);
 }
