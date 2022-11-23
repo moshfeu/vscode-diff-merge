@@ -1,3 +1,10 @@
+## 🌅🌅 This extension is (almost) not needed anymore 🌅🌅
+
+Since vscode has this feature built-in, and even a better one, this extension is no longer needed.
+
+I keep the extension and the source code for education and refrences only.
+
+
 [![Build Status](https://dev.azure.com/moshfeu-vscode/DiffMergeExtension/_apis/build/status/moshfeu.vscode-diff-merge?branchName=master)](https://dev.azure.com/moshfeu-vscode/DiffMergeExtension/_build/latest?definitionId=1&branchName=master)
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-yellow.svg?style=flat)](https://github.com/Coding-Coach/find-a-mentor/issues)
 [![The MIT License](https://flat.badgen.net/badge/license/MIT/orange)](http://opensource.org/licenses/MIT)
