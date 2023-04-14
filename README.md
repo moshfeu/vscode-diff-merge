@@ -1,6 +1,6 @@
 ## 🌅🌅 This extension is (almost) not needed anymore 🌅🌅
 
-Since vscode has this feature built-in, and even a better one, this extension is no longer needed.
+Since vscode [has 3 way merge built-in](https://code.visualstudio.com/updates/v1_69#_3-way-merge-editor), and even a better one, this extension is no longer needed.
 
 I keep the extension and the source code for education and refrences only.
 
@@ -9,7 +9,7 @@ I keep the extension and the source code for education and refrences only.
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-yellow.svg?style=flat)](https://github.com/Coding-Coach/find-a-mentor/issues)
 [![The MIT License](https://flat.badgen.net/badge/license/MIT/orange)](http://opensource.org/licenses/MIT)
 [![GitHub](https://flat.badgen.net/github/release/moshfeu/vscode-diff-merge)](https://github.com/moshfeu/vscode-diff-merge/releases)
-[![Visual Studio Marketplace](https://vsmarketplacebadge.apphb.com/installs-short/moshfeu.diff-merge.svg?style=flat-square)](https://marketplace.visualstudio.com/items?itemName=moshfeu.diff-merge)
+[![Visual Studio Marketplace](https://img.shields.io/vscode-marketplace/i/moshfeu.diff-merge.svg?style=flat-square)](https://marketplace.visualstudio.com/items?itemName=moshfeu.diff-merge)
 [![Follow me on Twitter](https://img.shields.io/twitter/follow/moshfeu.svg?style=social)](https://twitter.com/moshfeu)
 
 # Diff & Merge!
