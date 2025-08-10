@@ -24,6 +24,14 @@ export function init(context: ExtensionContext) {
       'diffMerge.compareFileWithClipboard',
       compareFileWithClipboard
     ),
+    commands.registerCommand(
+      'diffMerge.compareSelectionWithClipboard',
+      compareSelectionWithClipboard
+    ),
+    commands.registerCommand(
+      'diffMerge.compareClipboardWithPrevious',
+      compareClipboardWithPrevious
+    ),
     commands.registerCommand('diffMerge.openWithDiffMerge', reopenCurrentWithDiffMerge),
     commands.registerCommand('diffMerge.applyAllChanges', applyAllChanges)
   );
@@ -71,6 +79,70 @@ export function init(context: ExtensionContext) {
       rightPath: document.uri.fsPath,
       rightContent: document.getText(),
     });
+  }
+
+  async function compareSelectionWithClipboard() {
+    const editor = window.activeTextEditor;
+    if (!editor) {
+      window.showInformationMessage(
+        'This command has to be run only when a text based file is open'
+      );
+      log('This command has to be run only when a file is open');
+      return;
+    }
+
+    const selection = editor.selection;
+    if (selection.isEmpty) {
+      window.showInformationMessage(
+        'Please select some text to compare with clipboard'
+      );
+      log('No text selected for comparison');
+      return;
+    }
+
+    const selectedText = editor.document.getText(selection);
+    const clipboardText = await env.clipboard.readText();
+
+    showDiff({
+      context,
+      leftContent: clipboardText,
+      leftPath: 'Clipboard',
+      rightPath: `Selection from ${editor.document.uri.fsPath}`,
+      rightContent: selectedText,
+    });
+  }
+
+  async function compareClipboardWithPrevious() {
+    const currentClipboard = await env.clipboard.readText();
+    
+    if (!previousClipboardContent) {
+      // Store current clipboard as previous for next time
+      previousClipboardContent = currentClipboard;
+      window.showInformationMessage(
+        'Previous clipboard content saved. Run this command again to compare with current clipboard.'
+      );
+      log('Previous clipboard content saved');
+      return;
+    }
+
+    if (currentClipboard === previousClipboardContent) {
+      window.showInformationMessage(
+        'Current clipboard content is the same as previous clipboard content.'
+      );
+      log('Clipboard content unchanged');
+      return;
+    }
+
+    showDiff({
+      context,
+      leftContent: previousClipboardContent,
+      leftPath: 'Previous Clipboard',
+      rightPath: 'Current Clipboard',
+      rightContent: currentClipboard,
+    });
+
+    // Update previous clipboard to current for next comparison
+    previousClipboardContent = currentClipboard;
   }
 
   function blank() {
@@ -130,6 +202,7 @@ export function init(context: ExtensionContext) {
   }
 
   let selectedFilePath: string;
+  let previousClipboardContent: string | undefined;
   function selectToCompare(e: Uri) {
     try {
       selectedFilePath = tryToGetPath(e);
