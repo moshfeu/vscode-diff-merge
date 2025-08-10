@@ -24,6 +24,10 @@ export function init(context: ExtensionContext) {
       'diffMerge.compareFileWithClipboard',
       compareFileWithClipboard
     ),
+    commands.registerCommand(
+      'diffMerge.compareSelectionWithClipboard',
+      compareSelectionWithClipboard
+    ),
     commands.registerCommand('diffMerge.openWithDiffMerge', reopenCurrentWithDiffMerge),
     commands.registerCommand('diffMerge.applyAllChanges', applyAllChanges)
   );
@@ -70,6 +74,37 @@ export function init(context: ExtensionContext) {
       leftPath: 'Clipboard',
       rightPath: document.uri.fsPath,
       rightContent: document.getText(),
+    });
+  }
+
+  async function compareSelectionWithClipboard() {
+    const editor = window.activeTextEditor;
+    if (!editor) {
+      window.showInformationMessage(
+        'This command has to be run only when a text based file is open'
+      );
+      log('This command has to be run only when a file is open');
+      return;
+    }
+
+    const selection = editor.selection;
+    if (selection.isEmpty) {
+      window.showInformationMessage(
+        'Please select some text to compare with clipboard'
+      );
+      log('No text selected for comparison');
+      return;
+    }
+
+    const selectedText = editor.document.getText(selection);
+    const clipboardText = await env.clipboard.readText();
+
+    showDiff({
+      context,
+      leftContent: clipboardText,
+      leftPath: 'Clipboard',
+      rightPath: `Selection from ${editor.document.uri.fsPath}`,
+      rightContent: selectedText,
     });
   }
 

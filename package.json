@@ -135,12 +135,28 @@
         {
           "command": "diffMerge.compareFileWithClipboard",
           "group": "z@102"
+        },
+        {
+          "command": "diffMerge.compareSelectionWithClipboard",
+          "when": "editorHasSelection",
+          "group": "z@103"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "diffMerge.compareSelectionWithClipboard",
+          "when": "editorHasSelection",
+          "group": "3_compare@100"
         }
       ],
       "commandPalette": [
         {
           "command": "diffMerge.chooseFile",
           "when": "editorIsOpen"
+        },
+        {
+          "command": "diffMerge.compareSelectionWithClipboard",
+          "when": "editorHasSelection"
         },
         {
           "command": "diffMerge.scm.file",
@@ -216,6 +232,10 @@
       {
         "title": "[Diff & Merge] Compare file with Clipboard",
         "command": "diffMerge.compareFileWithClipboard"
+      },
+      {
+        "title": "[Diff & Merge] Compare selection with Clipboard",
+        "command": "diffMerge.compareSelectionWithClipboard"
       },
       {
         "title": "[Diff & Merge] Select file to compare",
