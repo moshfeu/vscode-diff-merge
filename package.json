@@ -64,7 +64,7 @@
   },
   "dependencies": {
     "istextorbinary": "^3.0.0",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.23"
   },
   "contributes": {
     "menus": {
